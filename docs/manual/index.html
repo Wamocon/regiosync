@@ -1,702 +1,1512 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-lang="de" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!--
-    HANDBOOK META - updated by Copilot on every relevant change
-    APP_NAME        : RegioSync
-    APP_VERSION     : 0.1.0
-    LAST_UPDATED    : Mai 2026
-    PRIMARY_COLOR   : #16a34a
-    PRIMARY_DARK    : #15803d
-    LOGO_EMOJI      : &#127807;
-  -->
-  <title>RegioSync &ndash; Produkthandbuch | WAMOCON</title>
+  <title>RegioSync &ndash; Produkthandbuch / Product Manual | WAMOCON GmbH</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" defer></script>
   <style>
-    /* ── Reset & Base ──────────────────────────────────────────────── */
+    /* ═══ Reset ═════════════════════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ═══ CSS Variables ══════════════════════════════════════════════ */
     :root {
-      /* Brand colors - RegioSync green palette */
       --primary:      #16a34a;
-      --primary-dark: #15803d;
-      --primary-glow: rgba(22,163,74,0.18);
-      --success:      #10b981;
-      --warning:      #f59e0b;
-      --danger:       #ef4444;
+      --primary-dk:   #15803d;
+      --primary-bg:   rgba(22,163,74,0.12);
+      --primary-pill: rgba(22,163,74,0.18);
 
-      /* Dark-theme background layers */
-      --bg-page:   #0d1526;
-      --bg-card:   rgba(255,255,255,0.03);
-      --bg-code:   rgba(255,255,255,0.06);
+      --bg:       #111827;
+      --bg-card:  #1f2937;
+      --bg-hover: #374151;
+      --bg-input: #1f2937;
 
-      /* Text hierarchy */
-      --text:       #f1f5f9;
-      --text-muted: #94a3b8;
-      --text-dim:   #475569;
+      --text:       #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim:   #6b7280;
 
-      /* Borders */
-      --border: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.1);
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+
+      --sidebar-w:  280px;
+      --header-h:   72px;
     }
 
-    html { scroll-behavior: smooth; }
+    [data-theme="light"] {
+      --bg:       #f9fafb;
+      --bg-card:  #ffffff;
+      --bg-hover: #f3f4f6;
+      --bg-input: #ffffff;
+      --text:       #111827;
+      --text-muted: #6b7280;
+      --text-dim:   #9ca3af;
+      --border: rgba(0,0,0,0.12);
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
 
     body {
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg-page);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+      background: var(--bg);
       color: var(--text);
       line-height: 1.7;
-      min-height: 100vh;
+      transition: background 0.25s, color 0.25s;
     }
 
     a { color: var(--primary); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* ── No-print utility ─────────────────────────────────────────── */
-    @media print {
-      .no-print { display: none !important; }
-      #toc-sidebar { display: none !important; }
-      .layout { display: block !important; }
-      main { padding: 2rem !important; max-width: 100% !important; }
-      .page-header { position: static !important; }
-      body { background: #fff !important; color: #000 !important; }
-      :root {
-        --text: #000; --text-muted: #333; --bg-page: #fff;
-        --bg-card: #f5f5f5; --border: #ddd; --primary: #1d4ed8;
-      }
-      .cover { background: #f0f4ff !important; border-color: #1d4ed8 !important; }
-      h2 { color: #1d4ed8 !important; border-color: #1d4ed8 !important; }
-      .page-footer { position: static !important; border-top: 1px solid #ddd; }
-    }
-
-    /* ── Header ───────────────────────────────────────────────────── */
-    .page-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      height: 70px;
-      background: rgba(13,21,38,0.95);
+    /* ═══ Top bar ════════════════════════════════════════════════════ */
+    .topbar {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--bg);
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       padding: 0 2rem;
+      height: var(--header-h);
+      display: flex; align-items: center; justify-content: space-between;
       gap: 1rem;
     }
 
-    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .topbar-left { display: flex; flex-direction: column; gap: 0.2rem; }
 
-    .logo-mark {
-      width: 44px; height: 44px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    .breadcrumb {
+      font-size: 0.75rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .breadcrumb a { color: var(--text-muted); }
+    .breadcrumb a:hover { color: var(--primary); text-decoration: none; }
+
+    .page-title {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .page-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(22,163,74,0.15);
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 900; color: #fff;
-      box-shadow: 0 4px 12px var(--primary-glow);
+      font-size: 18px; flex-shrink: 0;
+    }
+    .page-title h1 {
+      font-size: 1.15rem; font-weight: 800; line-height: 1.2;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+
+    .ctrl-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.35rem 0.75rem; border-radius: 8px;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      border: 1px solid var(--border); background: var(--bg-card);
+      color: var(--text-muted); transition: 0.2s; white-space: nowrap;
+    }
+    .ctrl-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    .lang-pill { display: flex; background: var(--bg-card); border-radius: 8px; padding: 2px; border: 1px solid var(--border); }
+    .lang-pill button {
+      padding: 0.28rem 0.6rem; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 800;
+      border: none; cursor: pointer;
+      background: transparent; color: var(--text-muted); transition: 0.2s;
+    }
+    .lang-pill button.active { background: var(--primary); color: #fff; }
+
+    /* ═══ Search bar ════════════════════════════════════════════════ */
+    .search-wrap {
+      max-width: 680px;
+      margin: 1.5rem 2rem 0;
+      position: relative;
+    }
+    .search-wrap svg {
+      position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+      color: var(--text-dim); pointer-events: none; width: 18px; height: 18px;
+    }
+    #search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none; transition: 0.2s;
+    }
+    #search-input:focus { border-color: var(--primary); }
+    #search-input::placeholder { color: var(--text-dim); }
+
+    .search-no-results {
+      display: none;
+      margin: 0.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ═══ Layout ═════════════════════════════════════════════════════ */
+    .hb-layout {
+      display: flex;
+      gap: 0;
+      max-width: 1320px;
+      margin: 1.5rem auto 0;
+      padding: 0 2rem;
+      align-items: flex-start;
+    }
+
+    /* ═══ TOC Sidebar ════════════════════════════════════════════════ */
+    .toc-sidebar {
+      width: var(--sidebar-w);
       flex-shrink: 0;
-    }
-
-    .brand-name { color: #fff; font-weight: 800; font-size: 1.1rem; }
-    .brand-sub  { color: var(--text-muted); font-size: 0.7rem; letter-spacing: 0.05em; font-weight: 600; }
-    .header-meta { color: var(--text-dim); font-size: 0.75rem; text-align: right; }
-
-    /* ── Header actions ───────────────────────────────────────────── */
-    .header-actions { display: flex; align-items: center; gap: 0.75rem; }
-
-    .btn {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem;
-      font-weight: 700; cursor: pointer; border: none; transition: 0.2s;
-      text-decoration: none; white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: var(--primary); color: #fff;
-    }
-    .btn-primary:hover { background: var(--primary-dark); text-decoration: none; }
-
-    .btn-outline {
-      background: transparent; color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-    .btn-outline:hover { border-color: var(--primary); color: var(--primary); text-decoration: none; }
-
-    /* ── PDF download / OneDrive buttons ─────────────────────────── */
-    .download-bar {
-      display: flex; align-items: center; gap: 0.5rem;
-      background: rgba(59,130,246,0.06);
-      border: 1px solid rgba(59,130,246,0.2);
-      border-radius: 10px; padding: 0.5rem 1rem;
-      font-size: 0.8rem; color: var(--text-muted);
-    }
-    .download-bar strong { color: var(--text); }
-
-    /* ── Layout ───────────────────────────────────────────────────── */
-    .layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: calc(100vh - 70px);
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    /* ── Sidebar TOC ──────────────────────────────────────────────── */
-    #toc-sidebar {
       position: sticky;
-      top: 70px;
-      height: calc(100vh - 70px);
+      top: calc(var(--header-h) + 1rem);
+      max-height: calc(100vh - var(--header-h) - 2rem);
       overflow-y: auto;
-      padding: 2rem 1.5rem;
-      border-right: 1px solid var(--border);
-      background: rgba(13,21,38,0.4);
+      padding-right: 1.5rem;
+      padding-bottom: 2rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .toc-sidebar::-webkit-scrollbar { width: 4px; }
+    .toc-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .toc-label {
+      font-size: 0.65rem; font-weight: 900; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 1rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
     }
 
-    .toc-title {
-      font-size: 0.7rem; font-weight: 900;
-      text-transform: uppercase; letter-spacing: 0.15em;
-      color: var(--text-dim); margin-bottom: 1rem;
+    .toc-section { margin-bottom: 0.25rem; }
+
+    .toc-main {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.45rem 0.75rem; border-radius: 8px;
+      cursor: pointer; transition: 0.15s;
+      color: var(--text-muted); font-size: 0.85rem; font-weight: 600;
+      text-decoration: none;
+    }
+    .toc-main:hover { background: var(--bg-hover); color: var(--text); text-decoration: none; }
+    .toc-main.active {
+      background: var(--primary-pill);
+      color: var(--primary);
     }
 
-    .toc-link {
-      display: block; padding: 0.5rem 0;
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.85rem; transition: 0.2s;
+    .toc-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--bg-hover); color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 900; flex-shrink: 0;
+      transition: 0.15s;
     }
-    .toc-link:hover { color: var(--primary); transform: translateX(4px); text-decoration: none; }
-    .toc-link.l1 {
-      font-weight: 700; color: var(--text);
-      border-top: 1px solid var(--border);
-      margin-top: 1rem; padding-top: 1rem;
-    }
-    .toc-link.l2 { padding-left: 1rem; font-size: 0.8rem; }
-    .toc-link.l1:first-of-type { border-top: none; margin-top: 0; }
+    .toc-main.active .toc-num { background: var(--primary); color: #fff; }
+    .toc-main:hover .toc-num { background: var(--primary); color: #fff; }
 
-    /* ── Main content ─────────────────────────────────────────────── */
-    main { padding: 3rem 4rem 6rem; max-width: 900px; }
-
-    /* ── Cover page ───────────────────────────────────────────────── */
-    .cover {
-      background: linear-gradient(160deg, rgba(30,60,130,0.2) 0%, rgba(13,21,38,0.9) 100%);
-      border: 1px solid rgba(59,130,246,0.25);
-      border-radius: 24px; padding: 4rem;
-      margin-bottom: 4rem; position: relative; overflow: hidden;
+    .toc-subs { padding-left: 2.2rem; margin-bottom: 0.25rem; }
+    .toc-sub {
+      display: block;
+      padding: 0.28rem 0.5rem; border-radius: 6px;
+      font-size: 0.78rem; color: var(--text-dim);
+      transition: 0.15s; text-decoration: none;
     }
-    .cover::before {
-      content: '';
-      position: absolute; top: -40px; right: -40px;
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
-      pointer-events: none;
+    .toc-sub:hover { color: var(--primary); background: var(--bg-hover); text-decoration: none; }
+
+    .toc-section.hidden { display: none; }
+
+    /* ═══ Main content ═══════════════════════════════════════════════ */
+    .hb-main {
+      flex: 1; min-width: 0;
+      padding: 0 0 6rem 2rem;
     }
 
-    .doc-type {
-      font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
-      letter-spacing: 0.2em; color: var(--primary); margin-bottom: 1rem;
+    /* ═══ Sections ═══════════════════════════════════════════════════ */
+    .hb-section {
+      margin-bottom: 3.5rem;
+      padding-top: 0.5rem;
     }
-    .cover h1 { font-size: 3rem; font-weight: 900; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
-    .cover-sub { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 3rem; }
-    .cover-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 2rem; }
-    .meta-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 0.3rem; }
-    .meta-value { font-weight: 700; font-size: 1rem; }
+    .hb-section.hidden { display: none; }
 
-    /* ── Typography ───────────────────────────────────────────────── */
-    h2 {
-      font-size: 2rem; font-weight: 900; margin: 4rem 0 1.5rem;
-      border-bottom: 2px solid var(--primary); padding-bottom: 0.5rem;
-      display: flex; align-items: center; gap: 0.8rem;
-    }
-    h2 .num { color: var(--primary); opacity: 0.5; font-size: 1.2rem; }
-    h3 { font-size: 1.3rem; font-weight: 800; margin: 2.5rem 0 1rem; color: var(--primary); }
-    p { margin-bottom: 1.2rem; }
-    ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
-    li { margin-bottom: 0.52rem; }
-    li::marker { color: var(--primary); }
-    strong { color: #fff; }
-    code {
-      background: var(--bg-code); border: 1px solid var(--border);
-      border-radius: 6px; padding: 0.15em 0.45em;
-      font-family: 'JetBrains Mono', 'Fira Code', monospace;
-      font-size: 0.88em; color: var(--primary);
+    .section-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.75rem;
     }
 
-    /* ── Cards & Blocks ───────────────────────────────────────────── */
+    .section-badge {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--primary);
+      color: #fff; font-size: 1rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; box-shadow: 0 4px 12px rgba(22,163,74,0.35);
+    }
+
+    .section-header h2 {
+      font-size: 1.6rem; font-weight: 800; color: var(--text);
+      line-height: 1.25;
+    }
+
+    h3 {
+      font-size: 1.05rem; font-weight: 700; color: var(--text);
+      margin: 1.75rem 0 0.6rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h4 {
+      font-size: 0.9rem; font-weight: 700; color: var(--text-muted);
+      margin: 1.25rem 0 0.35rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    p { margin-bottom: 0.9rem; color: var(--text); font-size: 0.93rem; line-height: 1.75; }
+
+    ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+    li { margin-bottom: 0.35rem; font-size: 0.93rem; color: var(--text); line-height: 1.6; }
+
+    strong { font-weight: 700; }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+    /* ═══ Cards ══════════════════════════════════════════════════════ */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin: 1rem 0 1.5rem; }
     .card {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 1.5rem; margin: 1.5rem 0;
+      border-radius: 12px; padding: 1.25rem;
     }
+    .card h4 { margin-top: 0; font-size: 0.85rem; }
+    .card p { font-size: 0.85rem; margin: 0; }
 
+    /* ═══ Tables ═════════════════════════════════════════════════════ */
+    .tbl-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+    th { background: var(--bg-card); padding: 0.6rem 0.85rem; text-align: left; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+    td { padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .check { color: var(--primary); font-weight: 900; }
+    .cross { color: #ef4444; }
+
+    /* ═══ Callouts ═══════════════════════════════════════════════════ */
+    .callout { display: flex; gap: 0.85rem; padding: 0.9rem 1.1rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid; }
+    .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .callout-body { font-size: 0.87rem; line-height: 1.55; }
+    .callout-body strong { display: block; margin-bottom: 0.2rem; }
+    .callout-info    { background: rgba(59,130,246,0.08);  border-color: #3b82f6; }
+    .callout-tip     { background: rgba(22,163,74,0.08);   border-color: var(--primary); }
+    .callout-warn    { background: rgba(245,158,11,0.08);  border-color: #f59e0b; }
+    .callout-danger  { background: rgba(239,68,68,0.08);   border-color: #ef4444; }
+
+    /* ═══ Steps ══════════════════════════════════════════════════════ */
+    .steps { list-style: none; margin: 0.75rem 0 1.5rem; counter-reset: step; }
+    .steps li { counter-increment: step; display: flex; gap: 1rem; margin-bottom: 1rem; }
+    .steps li::before {
+      content: counter(step);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      font-size: 0.78rem; font-weight: 900; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 0.1rem;
+    }
+    .step-body { flex: 1; }
+    .step-title { font-weight: 700; font-size: 0.93rem; margin-bottom: 0.25rem; }
+    .step-desc { font-size: 0.87rem; color: var(--text-muted); margin: 0; }
+
+    /* ═══ Price cards ════════════════════════════════════════════════ */
+    .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 1rem 0 1.5rem; }
+    @media (max-width: 560px) { .price-grid { grid-template-columns: 1fr; } }
+    .price-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; position: relative; }
+    .price-card.featured { border-color: var(--primary); }
+    .featured-tag {
+      position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      background: var(--primary); color: #fff;
+      font-size: 0.68rem; font-weight: 900; padding: 0.18rem 0.7rem;
+      border-radius: 99px; white-space: nowrap;
+    }
+    .plan-name { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .plan-price { font-size: 2.4rem; font-weight: 900; color: var(--text); line-height: 1; }
+    .plan-unit { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem; margin-bottom: 1.25rem; }
+    .plan-features { list-style: none; margin: 0; }
+    .plan-features li { display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.87rem; }
+    .plan-features li::before { content: "&#10003;"; color: var(--primary); font-weight: 900; }
+
+    /* ═══ Badges ═════════════════════════════════════════════════════ */
     .badge {
-      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
-      font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.18rem 0.55rem; border-radius: 99px;
+      font-size: 0.7rem; font-weight: 800;
     }
-    .badge-success { background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
-    .badge-primary { background: var(--primary-glow); color: var(--primary); border: 1px solid rgba(59,130,246,0.2); }
-    .badge-warning { background: rgba(245,158,11,0.1); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
-    .badge-danger  { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+    .badge-free    { background: rgba(156,163,175,0.15); color: var(--text-muted); border: 1px solid rgba(156,163,175,0.3); }
+    .badge-pro     { background: rgba(245,158,11,0.15);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+    .badge-seller  { background: rgba(22,163,74,0.15);   color: var(--primary); border: 1px solid rgba(22,163,74,0.3); }
+    .badge-admin   { background: rgba(59,130,246,0.15);  color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+    .badge-user    { background: rgba(168,85,247,0.15);  color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
 
-    .info-box {
-      padding: 1.2rem 1.5rem; border-radius: 12px; margin: 2rem 0;
-      border-left: 4px solid var(--primary); background: rgba(59,130,246,0.05);
-    }
-    .info-box-title { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: 0.5rem; }
+    /* ═══ Language visibility ════════════════════════════════════════ */
+    [data-lang="en"] .de-only { display: none !important; }
+    [data-lang="de"] .en-only { display: none !important; }
 
-    .warn-box {
-      padding: 1.2rem 1.5rem; border-radius: 12px; margin: 2rem 0;
-      border-left: 4px solid var(--danger); background: rgba(239,68,68,0.05);
-    }
-    .warn-box-title { font-weight: 900; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--danger); margin-bottom: 0.5rem; }
+    /* ═══ PDF-only elements (hidden in web view) ══════════════════════ */
+    .pdf-only { display: none !important; }
 
-    /* ── Feature Grid ─────────────────────────────────────────────── */
-    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 2rem 0; }
-    .feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; }
-    .feature-icon { font-size: 1.8rem; margin-bottom: 0.7rem; }
-    .feature-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.4rem; color: #fff; }
-    .feature-desc { font-size: 0.82rem; color: var(--text-muted); }
-
-    /* ── Table ────────────────────────────────────────────────────── */
-    .table-wrap { overflow-x: auto; margin: 2rem 0; border-radius: 12px; border: 1px solid var(--border); }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th {
-      text-align: left; padding: 1rem;
-      background: rgba(255,255,255,0.02); color: var(--text-muted);
-      font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.1em;
-    }
-    td { padding: 1rem; border-top: 1px solid var(--border); vertical-align: top; }
-    tr:hover td { background: rgba(59,130,246,0.02); }
-
-    .yes { color: var(--success); font-weight: 700; }
-    .no  { color: var(--text-dim); }
-
-    /* ── Footer ───────────────────────────────────────────────────── */
-    .page-footer {
+    /* ═══ Handbook footer ════════════════════════════════════════════ */
+    .hb-footer {
       border-top: 1px solid var(--border);
-      padding: 2rem 4rem;
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1400px;
-      margin: 0 auto;
+      padding: 1.75rem 2rem;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
+      margin-top: 2rem;
+    }
+    .hb-footer-meta { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+    .hb-footer-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+    .btn-pdf {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.25rem; border-radius: 10px;
+      background: var(--primary); color: #fff;
+      font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-pdf:hover { background: var(--primary-dk); }
+    .btn-pdf:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-print {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.25rem; border-radius: 10px;
+      background: transparent; color: var(--text-muted);
+      font-size: 0.85rem; font-weight: 700;
+      border: 1.5px solid var(--border); cursor: pointer; transition: 0.2s;
+    }
+    .btn-print:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ═══ PDF PRINT STYLES ═══════════════════════════════════════════ */
+    @media print {
+      .topbar, .search-wrap, .toc-sidebar, .hb-footer, .no-print { display: none !important; }
+      .hb-layout { display: block; padding: 0; margin: 0; }
+      .hb-main { padding: 0; }
+      body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+      .hb-section { page-break-before: always; margin: 0; padding: 2rem 0; }
+      .hb-section:first-child { page-break-before: avoid; }
+      .section-badge { background: #16a34a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      h2, h3 { color: #111 !important; }
+      a { color: #16a34a !important; }
+      .card { border: 1px solid #e5e7eb !important; background: #f9fafb !important; }
     }
 
-    /* ── Responsive ───────────────────────────────────────────────── */
-    @media (max-width: 1000px) {
-      .layout { grid-template-columns: 1fr; }
-      #toc-sidebar { display: none; }
-      main { padding: 2rem 1.5rem 4rem; }
-      .cover { padding: 2rem; }
-      .cover h1 { font-size: 2rem; }
-      .page-footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
-      .header-actions .download-bar { display: none; }
+    /* ═══ Responsive ═════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .toc-sidebar { display: none; }
+      .hb-layout { padding: 0 1rem; }
+      .hb-main { padding-left: 0; }
+      .topbar { padding: 0 1rem; }
+      .search-wrap { margin: 1rem 1rem 0; }
+    }
+    @media (max-width: 600px) {
+      .price-grid { grid-template-columns: 1fr; }
+      .card-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── Header ──────────────────────────────────────────────────────── -->
-<header class="page-header no-print">
-  <div class="brand">
-    <!-- LOGO: RegioSync green leaf logo -->
-    <div class="logo-mark" aria-label="App logo">&#127807;</div>
-    <div>
-      <div class="brand-name">RegioSync</div>
-      <div class="brand-sub">WAMOCON &middot; Produkthandbuch</div>
+<!-- ══ TOP BAR ═══════════════════════════════════════════════════════ -->
+<header class="topbar no-print">
+  <div class="topbar-left">
+    <nav class="breadcrumb">
+      <a href="https://www.regiosync.eu">RegioSync</a>
+      <span>&rsaquo;</span>
+      <span class="de-only">Produkthandbuch</span>
+      <span class="en-only">Product Handbook</span>
+    </nav>
+    <div class="page-title">
+      <div class="page-icon">&#128270;</div>
+      <h1>
+        <span class="de-only">Produkthandbuch</span>
+        <span class="en-only">Product Handbook</span>
+      </h1>
     </div>
   </div>
 
-  <div class="header-actions">
-    <div class="download-bar">
-      <strong>PDF &amp; OneDrive:</strong>&nbsp;Drucken &rarr; Als PDF speichern &rarr; In OneDrive ablegen
+  <div class="topbar-right">
+    <div class="lang-pill" role="group">
+      <button id="btn-de" class="active" onclick="setLang('de')">DE</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
     </div>
-    <!-- PDF Download button - uses browser print dialog (Save as PDF) -->
-    <button class="btn btn-primary" onclick="window.print()" title="Als PDF speichern (Drucken &rarr; Als PDF speichern)">
-      &#128196; PDF speichern
-    </button>
-    <!-- OneDrive save - opens instructions modal -->
-    <button class="btn btn-outline" onclick="document.getElementById('onedrive-modal').style.display='flex'" title="In OneDrive speichern">
-      &#9729; OneDrive
+    <button class="ctrl-btn" onclick="toggleTheme()" id="theme-btn">
+      <span id="theme-icon">&#9728;&#65039;</span>
     </button>
   </div>
 </header>
 
-<!-- ── OneDrive instructions modal ─────────────────────────────────── -->
-<div id="onedrive-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; align-items:center; justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:#1e2a42; border:1px solid var(--border); border-radius:20px; padding:2.5rem; max-width:480px; width:90%;">
-    <h3 style="color:var(--primary); margin-bottom:1rem;">&#9729; In OneDrive speichern</h3>
-    <ol style="color:var(--text-muted); font-size:0.9rem; line-height:1.8;">
-      <li>Klicke auf <strong style="color:#fff;">&#128196; PDF speichern</strong></li>
-      <li>Im Druckdialog: Drucker auf <strong style="color:#fff;">"Als PDF speichern"</strong> stellen</li>
-      <li>Speicherort: <strong style="color:#fff;">OneDrive-Ordner</strong> ausw&auml;hlen</li>
-      <li><strong style="color:#fff;">Speichern</strong> klicken &mdash; fertig</li>
-    </ol>
-    <p style="color:var(--text-dim); font-size:0.8rem; margin-top:1.5rem;">
-      Alternativ: Datei herunterladen und per <strong>OneDrive Sync-Client</strong>
-      oder <strong>onedrive.live.com</strong> hochladen.
-    </p>
-    <button class="btn btn-primary" style="margin-top:1.5rem; width:100%;" onclick="document.getElementById('onedrive-modal').style.display='none'">
-      Verstanden
-    </button>
-  </div>
+<!-- ══ SEARCH ════════════════════════════════════════════════════════ -->
+<div class="search-wrap no-print">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="search" id="search-input" autocomplete="off"
+    placeholder="Handbuch durchsuchen... / Search handbook..." />
+  <p class="search-no-results" id="search-no-results">
+    <span class="de-only">Keine Ergebnisse gefunden.</span>
+    <span class="en-only">No results found.</span>
+  </p>
 </div>
 
-<!-- ── Main layout ──────────────────────────────────────────────────── -->
-<div class="layout">
+<!-- ══ LAYOUT ════════════════════════════════════════════════════════ -->
+<div class="hb-layout">
 
-  <!-- ── Sidebar TOC ─────────────────────────────────────────────── -->
-  <nav id="toc-sidebar" class="no-print" aria-label="Inhaltsverzeichnis">
-    <div class="toc-title">Inhalt</div>
-    <a class="toc-link l1" href="#uebersicht">01 &Uuml;bersicht</a>
-    <a class="toc-link l1" href="#features">02 Funktionen</a>
-    <a class="toc-link l2" href="#feature-list">2.1 Feature-Liste</a>
-    <a class="toc-link l2" href="#plaene">2.2 Pl&auml;ne &amp; Preise</a>
-    <a class="toc-link l1" href="#tutorials">03 Erste Schritte</a>
-    <a class="toc-link l2" href="#tut-konto">3.1 Konto erstellen</a>
-    <a class="toc-link l2" href="#tut-start">3.2 Loslegen</a>
-    <a class="toc-link l2" href="#tut-upgrade">3.3 Upgrade</a>
-    <a class="toc-link l1" href="#howto">04 How-to Guides</a>
-    <a class="toc-link l2" href="#ht-profil">4.1 Profil verwalten</a>
-    <a class="toc-link l2" href="#ht-loeschen">4.2 Konto l&ouml;schen</a>
-    <a class="toc-link l1" href="#referenz">05 Funktionsreferenz</a>
-    <a class="toc-link l2" href="#routen">5.1 Routen</a>
-    <a class="toc-link l2" href="#api">5.2 API &amp; Hooks</a>
-    <a class="toc-link l1" href="#tech">06 Technische Architektur</a>
-    <a class="toc-link l2" href="#tech-stack">6.1 Stack</a>
-    <a class="toc-link l2" href="#tech-schema">6.2 Datenbank-Schema</a>
-    <a class="toc-link l1" href="#ci-cd">07 CI/CD &amp; Tests</a>
-    <a class="toc-link l1" href="#compliance">08 DSGVO &amp; Compliance</a>
-    <a class="toc-link l1" href="#glossar">09 Glossar</a>
-  </nav>
+  <!-- ── TOC SIDEBAR ──────────────────────────────────────────────── -->
+  <aside class="toc-sidebar no-print" id="toc-sidebar">
+    <div class="toc-label">Table of Contents</div>
 
-  <!-- ── Main ────────────────────────────────────────────────────── -->
-  <main>
-
-    <!-- ── Cover ─────────────────────────────────────────────────── -->
-    <div class="cover">
-      <div class="doc-type">Offizielles Produkthandbuch &middot; WAMOCON GmbH</div>
-      <h1>RegioSync</h1>
-      <div class="cover-sub">Frische regionale Produkte &ndash; direkt vom Erzeuger zu Ihnen</div>
-      <div class="cover-meta">
-        <div><div class="meta-label">Version</div><div class="meta-value">0.1.0</div></div>
-        <div><div class="meta-label">Status</div><div class="meta-value"><span class="badge badge-success">Produktiv</span></div></div>
-        <div><div class="meta-label">Pl&auml;ne</div><div class="meta-value">Free &amp; Pro</div></div>
-        <div><div class="meta-label">Datum</div><div class="meta-value">Mai 2026</div></div>
+    <div class="toc-section" data-section="s1">
+      <a class="toc-main" href="#s1">
+        <span class="toc-num">1</span>
+        <span class="de-only">Einfuehrung</span>
+        <span class="en-only">Introduction</span>
+      </a>
+      <div class="toc-subs">
+        <a class="toc-sub" href="#s1-about">
+          <span class="de-only">Was ist RegioSync?</span>
+          <span class="en-only">What is RegioSync?</span>
+        </a>
+        <a class="toc-sub" href="#s1-mission">Mission</a>
       </div>
     </div>
 
-    <!-- ── 1. Uebersicht ──────────────────────────────────────────── -->
-    <section id="uebersicht">
-      <h2><span class="num">01</span> &Uuml;bersicht</h2>
+    <div class="toc-section" data-section="s2">
+      <a class="toc-main" href="#s2">
+        <span class="toc-num">2</span>
+        <span class="de-only">Benutzerrollen</span>
+        <span class="en-only">User Roles</span>
+      </a>
+      <div class="toc-subs">
+        <a class="toc-sub" href="#s2-buyer">
+          <span class="de-only">Kaeufer</span>
+          <span class="en-only">Customer / Buyer</span>
+        </a>
+        <a class="toc-sub" href="#s2-seller">
+          <span class="de-only">Verkaeufer</span>
+          <span class="en-only">Seller</span>
+        </a>
+        <a class="toc-sub" href="#s2-admin">Administrator</a>
+      </div>
+    </div>
+
+    <div class="toc-section" data-section="s3">
+      <a class="toc-main" href="#s3">
+        <span class="toc-num">3</span>
+        <span class="de-only">Shops &amp; Produkte</span>
+        <span class="en-only">Shops &amp; Products</span>
+      </a>
+      <div class="toc-subs">
+        <a class="toc-sub" href="#s3-shops">
+          <span class="de-only">Shops durchsuchen</span>
+          <span class="en-only">Browse Shops</span>
+        </a>
+        <a class="toc-sub" href="#s3-products">
+          <span class="de-only">Produkte &amp; Kategorien</span>
+          <span class="en-only">Products &amp; Categories</span>
+        </a>
+        <a class="toc-sub" href="#s3-requests">
+          <span class="de-only">Produktanfragen</span>
+          <span class="en-only">Product Requests</span>
+        </a>
+        <a class="toc-sub" href="#s3-reviews">
+          <span class="de-only">Bewertungen</span>
+          <span class="en-only">Reviews</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="toc-section" data-section="s4">
+      <a class="toc-main" href="#s4">
+        <span class="toc-num">4</span>
+        <span class="de-only">Interaktive Karte</span>
+        <span class="en-only">Interactive Map</span>
+      </a>
+      <div class="toc-subs">
+        <a class="toc-sub" href="#s4-map">
+          <span class="de-only">Kartenansicht</span>
+          <span class="en-only">Map View</span>
+        </a>
+        <a class="toc-sub" href="#s4-features">
+          <span class="de-only">Kartenfunktionen</span>
+          <span class="en-only">Map Features</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="toc-section" data-section="s5">
+      <a class="toc-main" href="#s5">
+        <span class="toc-num">5</span>
+        <span class="de-only">Tarife &amp; Preise</span>
+        <span class="en-only">Plans &amp; Pricing</span>
+      </a>
+      <div class="toc-subs">
+        <a class="toc-sub" href="#s5-free">Free</a>
+        <a class="toc-sub" href="#s5-pro">Pro</a>
+        <a class="toc-sub" href="#s5-compare">
+          <span class="de-only">Vergleich</span>
+          <span class="en-only">Comparison</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="toc-section" data-section="s6">
+      <a class="toc-main" href="#s6">
+        <span class="toc-num">6</span>
+        <span class="de-only">Anleitungen</span>
+        <span class="en-only">Step-by-Step Guides</span>
+      </a>
+      <div class="toc-subs">
+        <a class="toc-sub" href="#s6-register">
+          <span class="de-only">Registrierung</span>
+          <span class="en-only">Registration</span>
+        </a>
+        <a class="toc-sub" href="#s6-seller">
+          <span class="de-only">Shop erstellen</span>
+          <span class="en-only">Create a Shop</span>
+        </a>
+        <a class="toc-sub" href="#s6-buyer">
+          <span class="de-only">Produkte finden</span>
+          <span class="en-only">Find Products</span>
+        </a>
+        <a class="toc-sub" href="#s6-admin">Admin</a>
+      </div>
+    </div>
+
+    <div class="toc-section" data-section="s7">
+      <a class="toc-main" href="#s7">
+        <span class="toc-num">7</span>
+        <span class="de-only">Regeln &amp; Pflichten</span>
+        <span class="en-only">Rules &amp; Obligations</span>
+      </a>
+      <div class="toc-subs">
+        <a class="toc-sub" href="#s7-general">
+          <span class="de-only">Allgemein</span>
+          <span class="en-only">General</span>
+        </a>
+        <a class="toc-sub" href="#s7-seller">
+          <span class="de-only">Verkaeufer</span>
+          <span class="en-only">Sellers</span>
+        </a>
+        <a class="toc-sub" href="#s7-gdpr">DSGVO / GDPR</a>
+      </div>
+    </div>
+
+    <div class="toc-section" data-section="s8">
+      <a class="toc-main" href="#s8">
+        <span class="toc-num">8</span>
+        FAQ
+      </a>
+    </div>
+
+    <div class="toc-section" data-section="s9">
+      <a class="toc-main" href="#s9">
+        <span class="toc-num">9</span>
+        <span class="de-only">Rechtliches</span>
+        <span class="en-only">Legal</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ─────────────────────────────────────────────── -->
+  <main class="hb-main" id="hb-main">
+
+    <!-- PDF COVER (hidden in web view, shown during PDF export) -->
+    <div class="pdf-only" id="pdf-cover" style="text-align:center;padding:80px 40px;page-break-after:always;">
+      <div style="display:inline-block;width:80px;height:80px;border-radius:20px;background:#16a34a;color:#fff;font-size:40px;line-height:80px;margin-bottom:24px;">&#127807;</div>
+      <h1 style="font-size:3rem;font-weight:900;color:#16a34a;margin-bottom:8px;">RegioSync</h1>
+      <p style="font-size:1.25rem;font-weight:400;color:#6b7280;margin-bottom:40px;">Produkthandbuch / Product Manual</p>
+      <p style="color:#9ca3af;font-size:0.9rem;">21. Mai 2026 &nbsp;&mdash;&nbsp; www.regiosync.eu</p>
+      <p style="color:#9ca3af;font-size:0.9rem;margin-top:8px;">WAMOCON GmbH &nbsp;&mdash;&nbsp; Version 0.1.0</p>
+    </div>
+
+    <!-- PDF TOC PAGE (hidden in web view, shown during PDF export) -->
+    <div class="pdf-only" id="pdf-toc" style="padding:40px;page-break-after:always;">
+      <h2 style="font-size:1.6rem;font-weight:800;color:#16a34a;border-bottom:2px solid #16a34a;padding-bottom:12px;margin-bottom:24px;">Inhaltsverzeichnis / Table of Contents</h2>
+      <ol style="list-style:none;margin:0;padding:0;">
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>1.</strong> Einfuehrung / Introduction</span><span style="color:#9ca3af;">3</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>2.</strong> Benutzerrollen / User Roles</span><span style="color:#9ca3af;">4</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>3.</strong> Shops &amp; Produkte / Shops &amp; Products</span><span style="color:#9ca3af;">5</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>4.</strong> Interaktive Karte / Interactive Map</span><span style="color:#9ca3af;">6</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>5.</strong> Tarife &amp; Preise / Plans &amp; Pricing</span><span style="color:#9ca3af;">7</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>6.</strong> Anleitungen / Step-by-Step Guides</span><span style="color:#9ca3af;">8</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>7.</strong> Regeln &amp; Pflichten / Rules &amp; Obligations</span><span style="color:#9ca3af;">9</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>8.</strong> FAQ</span><span style="color:#9ca3af;">10</span>
+        </li>
+        <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted #e5e7eb;">
+          <span><strong>9.</strong> Rechtliches / Legal Information</span><span style="color:#9ca3af;">11</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- ══ SECTION 1: INTRODUCTION ════════════════════════════════ -->
+    <section class="hb-section" id="s1" data-title-de="Einfuehrung" data-title-en="Introduction">
+      <div class="section-header">
+        <div class="section-badge">1</div>
+        <h2>
+          <span class="de-only">Einfuehrung</span>
+          <span class="en-only">Introduction</span>
+        </h2>
+      </div>
+
+      <h3 id="s1-about">
+        <span class="de-only">Was ist RegioSync?</span>
+        <span class="en-only">What is RegioSync?</span>
+      </h3>
+
+      <p class="de-only">RegioSync ist eine webbasierte Plattform, die lokale Haendler, Bauern, Handwerker und Produzenten direkt mit regionalen Kaeuferinnen und Kaeufer vernetzt. Entdecke frische, regionale Produkte auf einer interaktiven Karte &ndash; ohne Mittelsmaenner, ohne Transaktionsgebuehren.</p>
+      <p class="en-only">RegioSync is a web-based platform that connects local traders, farmers, artisans and producers directly with regional buyers. Discover fresh, regional products on an interactive map &ndash; no middlemen, no transaction fees.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>&#127808; <span class="de-only">Lokal zuerst</span><span class="en-only">Local First</span></h4>
+          <p class="de-only">Finde Shops und Produkte aus deiner unmittelbaren Naehe und unterstuetze deine Community.</p>
+          <p class="en-only">Find shops and products from your immediate neighbourhood and support your community.</p>
+        </div>
+        <div class="card">
+          <h4>&#128279; <span class="de-only">Direktverbindung</span><span class="en-only">Direct Connection</span></h4>
+          <p class="de-only">Kommuniziere direkt mit lokalen Produzenten ohne Plattformgebuehren auf Transaktionen.</p>
+          <p class="en-only">Communicate directly with local producers without any transaction platform fees.</p>
+        </div>
+        <div class="card">
+          <h4>&#128200; <span class="de-only">Interaktive Karte</span><span class="en-only">Interactive Map</span></h4>
+          <p class="de-only">Entdecke regionale Shops auf einer Echtzeit-Karte. Pro-Nutzer erhalten Wegbeschreibungen.</p>
+          <p class="en-only">Discover regional shops on a real-time map. Pro users get directions to any shop.</p>
+        </div>
+        <div class="card">
+          <h4>&#11088; <span class="de-only">Bewertungssystem</span><span class="en-only">Review System</span></h4>
+          <p class="de-only">Nutzer koennen Shops bewerten und so der Gemeinschaft helfen, gute Entscheidungen zu treffen.</p>
+          <p class="en-only">Users can rate shops and products, helping the community make informed decisions.</p>
+        </div>
+      </div>
+
+      <h3 id="s1-mission">Mission &amp; Vision</h3>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">&#127808;</span>
+        <div class="callout-body">
+          <strong class="de-only">Unsere Mission</strong>
+          <strong class="en-only">Our Mission</strong>
+          <span class="de-only">RegioSync verbindet lokale Wirtschaft mit digitaler Reichweite. Wir glauben, dass der Einkauf vor Ort einfacher, transparenter und zugaenglicher sein muss &ndash; fuer Kaeufer genauso wie fuer kleine Produzenten.</span>
+          <span class="en-only">RegioSync bridges local commerce with digital reach. We believe shopping locally should be easier, more transparent and accessible &ndash; for buyers as well as small producers.</span>
+        </div>
+      </div>
+
+      <p class="de-only">RegioSync wird entwickelt und betrieben von der <strong>WAMOCON GmbH</strong>, Eschborn. Die Plattform ist vollstaendig browserbasiert, erfordert keinen App-Download und unterstuetzt Deutsch und Englisch.</p>
+      <p class="en-only">RegioSync is developed and operated by <strong>WAMOCON GmbH</strong>, Eschborn. The platform is fully browser-based, requires no app download, and supports German and English.</p>
+    </section>
+
+    <!-- ══ SECTION 2: USER ROLES ══════════════════════════════════ -->
+    <section class="hb-section" id="s2" data-title-de="Benutzerrollen" data-title-en="User Roles">
+      <div class="section-header">
+        <div class="section-badge">2</div>
+        <h2>
+          <span class="de-only">Benutzerrollen &amp; Zugriffsrechte</span>
+          <span class="en-only">User Roles &amp; Access Rights</span>
+        </h2>
+      </div>
+
+      <p class="de-only">RegioSync kennt drei Benutzerrollen mit unterschiedlichen Berechtigungen.</p>
+      <p class="en-only">RegioSync has three user roles with different permissions.</p>
+
+      <h3 id="s2-buyer">
+        <span class="badge badge-user">&#128100;</span>
+        <span class="de-only"> Kaeufer / Nutzer</span>
+        <span class="en-only"> Customer / Buyer</span>
+      </h3>
+      <p class="de-only">Standardrolle nach der Registrierung. Kann Shops durchsuchen, Produkte ansehen, Bewertungen schreiben und Produktanfragen an Verkaeufer senden.</p>
+      <p class="en-only">Default role after registration. Can browse shops, view products, write reviews, and send product requests to sellers.</p>
+      <ul>
+        <li class="de-only">Shops durchsuchen und Produktlisten einsehen (Free: max. 5 Shops)</li>
+        <li class="en-only">Browse shops and view product listings (Free: max. 5 shops)</li>
+        <li class="de-only">Shops auf der interaktiven Karte finden</li>
+        <li class="en-only">Find shops on the interactive map</li>
+        <li class="de-only">Bewertungen schreiben (1&ndash;5 Sterne + Text)</li>
+        <li class="en-only">Write reviews (1&ndash;5 stars + text)</li>
+        <li class="de-only">Produktanfragen an Verkaeufer senden</li>
+        <li class="en-only">Send product requests to sellers</li>
+        <li class="de-only">Eigenes Profil verwalten (Name, Foto, Passwort)</li>
+        <li class="en-only">Manage own profile (name, photo, password)</li>
+      </ul>
+
+      <h3 id="s2-seller">
+        <span class="badge badge-seller">&#128722;</span>
+        <span class="de-only"> Verkaeufer</span>
+        <span class="en-only"> Seller</span>
+      </h3>
+      <p class="de-only">Kann bei der Registrierung gewaehlt werden. Erstellt und verwaltet Shops und Produkte, beantwortet Anfragen und nutzt das Verkaeufer-Dashboard.</p>
+      <p class="en-only">Can be chosen at registration. Creates and manages shops and products, responds to requests, and uses the seller dashboard.</p>
+      <ul>
+        <li class="de-only">Einen oder mehrere Shops erstellen und verwalten</li>
+        <li class="en-only">Create and manage one or more shops</li>
+        <li class="de-only">Produkte mit Beschreibung, Preis, Kategorie, Bild und Rabatt anlegen</li>
+        <li class="en-only">Create products with description, price, category, image and discount</li>
+        <li class="de-only">Shopstandort per GPS oder manuelle Kartenauswahl festlegen</li>
+        <li class="en-only">Set shop location via GPS or manual map selection</li>
+        <li class="de-only">Eingehende Produktanfragen annehmen oder ablehnen</li>
+        <li class="en-only">Accept or reject incoming product requests</li>
+        <li class="de-only">Statistiken einsehen: Shops, Produkte, Bewertungen, Durchschnittsbewertung</li>
+        <li class="en-only">View stats: shops, products, reviews, average rating</li>
+      </ul>
+
+      <h3 id="s2-admin">
+        <span class="badge badge-admin">&#128737;</span> Administrator
+      </h3>
+      <p class="de-only">Systemadministrator mit vollen Zugriffsrechten. Verwaltet alle Nutzer, vergibt Rollen, loescht Shops und Produkte, sieht Berichte ein.</p>
+      <p class="en-only">System administrator with full access. Manages all users, assigns roles, deletes shops and products, views reports.</p>
+      <ul>
+        <li class="de-only">Vollstaendige Benutzerverwaltung: Rollen aendern, Nutzer sperren/loeschen</li>
+        <li class="en-only">Full user management: change roles, ban/delete users</li>
+        <li class="de-only">Alle Shops und Produkte auf der Plattform anzeigen und loeschen</li>
+        <li class="en-only">View and delete all shops and products on the platform</li>
+        <li class="de-only">Gemeldete Inhalte einsehen und bearbeiten</li>
+        <li class="en-only">View and manage reported content</li>
+        <li class="de-only">Systemstatistiken einsehen: Nutzer, Verkaeufer, Kaeufer</li>
+        <li class="en-only">View system statistics: users, sellers, buyers</li>
+      </ul>
+    </section>
+
+    <!-- ══ SECTION 3: SHOPS & PRODUCTS ═══════════════════════════ -->
+    <section class="hb-section" id="s3" data-title-de="Shops und Produkte" data-title-en="Shops and Products">
+      <div class="section-header">
+        <div class="section-badge">3</div>
+        <h2>
+          <span class="de-only">Shops &amp; Produkte</span>
+          <span class="en-only">Shops &amp; Products</span>
+        </h2>
+      </div>
+
+      <h3 id="s3-shops">
+        <span class="de-only">Shops durchsuchen</span>
+        <span class="en-only">Browse Shops</span>
+      </h3>
+      <p class="de-only">Navigiere zur <strong>Shops</strong>-Seite, um alle registrierten lokalen Shops zu sehen. Nutze die Suchleiste, um nach Shopname oder Standort zu filtern.</p>
+      <p class="en-only">Navigate to the <strong>Shops</strong> page to see all registered local shops. Use the search bar to filter by shop name or location.</p>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">&#8505;</span>
+        <div class="callout-body">
+          <strong class="de-only">Free vs. Pro</strong>
+          <strong class="en-only">Free vs. Pro</strong>
+          <span class="de-only">Im Free-Tarif koennen Nutzer maximal 5 Shops durchsuchen. Ein Upgrade auf Pro hebt diese Einschraenkung auf und ermoeglicht unbegrenztes Stoeubern.</span>
+          <span class="en-only">In the Free plan, users can browse up to 5 shops. Upgrading to Pro removes this limit and enables unlimited browsing.</span>
+        </div>
+      </div>
+
+      <h3 id="s3-products">
+        <span class="de-only">Produkte &amp; Kategorien</span>
+        <span class="en-only">Products &amp; Categories</span>
+      </h3>
+      <p class="de-only">Jeder Shop kann Produkte in folgenden Kategorien anbieten:</p>
+      <p class="en-only">Each shop can list products in the following categories:</p>
+      <ul>
+        <li class="de-only"><strong>Obst</strong> &ndash; Frisches Obst aus der Region</li>
+        <li class="en-only"><strong>Fruits</strong> &ndash; Fresh regional fruit</li>
+        <li class="de-only"><strong>Gemuese</strong> &ndash; Saisonales Gemuese</li>
+        <li class="en-only"><strong>Vegetables</strong> &ndash; Seasonal vegetables</li>
+        <li class="de-only"><strong>Milchprodukte, Fleisch, Baeckerei, Honig, Eier, Kraeuter, Getraenke</strong></li>
+        <li class="en-only"><strong>Dairy, Meat, Bakery, Honey, Eggs, Herbs, Drinks</strong></li>
+        <li class="de-only"><strong>Sonstiges</strong> &ndash; Alle anderen regionalen Produkte</li>
+        <li class="en-only"><strong>Other</strong> &ndash; All other regional products</li>
+      </ul>
+      <p class="de-only">Produkte haben Name, Beschreibung, Preis (inkl. MwSt.), Menge, optionalen Rabatt und ein Bild.</p>
+      <p class="en-only">Products have a name, description, price (incl. VAT), quantity, optional discount and an image.</p>
+
+      <h3 id="s3-requests">
+        <span class="de-only">Produktanfragen</span>
+        <span class="en-only">Product Requests</span>
+      </h3>
+      <p class="de-only">Kaeufer koennen eine Anfrage fuer ein bestimmtes Produkt an einen Verkaeufer senden. Der Verkaeufer kann die Anfrage annehmen oder ablehnen. Status: <strong>Ausstehend / Angenommen / Abgelehnt</strong>.</p>
+      <p class="en-only">Buyers can send a request for a specific product to a seller. The seller can accept or reject it. Status: <strong>Pending / Accepted / Rejected</strong>.</p>
+
+      <h3 id="s3-reviews">
+        <span class="de-only">Bewertungen</span>
+        <span class="en-only">Reviews</span>
+      </h3>
+      <p class="de-only">Registrierte Nutzer koennen jeden Shop mit 1&ndash;5 Sternen bewerten und einen Textkommentar hinterlassen. Die Durchschnittsbewertung wird auf der Shop-Detailseite und im Verkaeufer-Dashboard angezeigt.</p>
+      <p class="en-only">Registered users can rate any shop 1&ndash;5 stars and leave a text comment. The average rating is shown on the shop detail page and in the seller dashboard.</p>
+    </section>
+
+    <!-- ══ SECTION 4: MAP ═════════════════════════════════════════ -->
+    <section class="hb-section" id="s4" data-title-de="Interaktive Karte" data-title-en="Interactive Map">
+      <div class="section-header">
+        <div class="section-badge">4</div>
+        <h2>
+          <span class="de-only">Interaktive Karte</span>
+          <span class="en-only">Interactive Map</span>
+        </h2>
+      </div>
+
+      <h3 id="s4-map">
+        <span class="de-only">Kartenansicht</span>
+        <span class="en-only">Map View</span>
+      </h3>
+      <p class="de-only">Die Karte zeigt alle registrierten Shops als Marker auf einer OpenStreetMap-Karte. Klicke auf einen Marker, um den Shop-Namen, die Entfernung und einen Link zur Shop-Detailseite zu sehen.</p>
+      <p class="en-only">The map displays all registered shops as markers on an OpenStreetMap base map. Click on a marker to see the shop name, distance, and a link to the shop detail page.</p>
+
+      <h3 id="s4-features">
+        <span class="de-only">Kartenfunktionen: Free vs. Pro</span>
+        <span class="en-only">Map Features: Free vs. Pro</span>
+      </h3>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><span class="de-only">Funktion</span><span class="en-only">Feature</span></th>
+              <th><span class="badge badge-free">Free</span></th>
+              <th><span class="badge badge-pro">Pro</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="de-only">Karte anzeigen</td>
+              <td class="en-only">View map</td>
+              <td class="check">&#10003;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Shop-Marker sehen</td>
+              <td class="en-only">See shop markers</td>
+              <td class="check">&#10003;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Zoom-Steuerung</td>
+              <td class="en-only">Zoom controls</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Wegbeschreibung</td>
+              <td class="en-only">Get Directions</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Eigener Standort</td>
+              <td class="en-only">My Location</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Vollbild-Ansicht</td>
+              <td class="en-only">Fullscreen view</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 5: PLANS & PRICING ═════════════════════════════ -->
+    <section class="hb-section" id="s5" data-title-de="Tarife und Preise" data-title-en="Plans and Pricing">
+      <div class="section-header">
+        <div class="section-badge">5</div>
+        <h2>
+          <span class="de-only">Tarife &amp; Preise</span>
+          <span class="en-only">Plans &amp; Pricing</span>
+        </h2>
+      </div>
+
+      <p class="de-only">RegioSync ist in zwei Tarifen verfuegbar.</p>
+      <p class="en-only">RegioSync is available in two plans.</p>
+
+      <div class="price-grid">
+        <div class="price-card" id="s5-free">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">0</div>
+          <div class="plan-unit de-only">EUR / Monat &ndash; dauerhaft kostenlos</div>
+          <div class="plan-unit en-only">EUR / month &ndash; permanently free</div>
+          <ul class="plan-features">
+            <li class="de-only">Bis zu 5 Shops durchsuchen</li>
+            <li class="en-only">Browse up to 5 shops</li>
+            <li class="de-only">Einfache Kartenansicht</li>
+            <li class="en-only">Basic map view</li>
+            <li class="de-only">Produktlisten anzeigen</li>
+            <li class="en-only">View product listings</li>
+            <li class="de-only">Bewertungen schreiben</li>
+            <li class="en-only">Write reviews</li>
+            <li class="de-only">Produktanfragen senden</li>
+            <li class="en-only">Send product requests</li>
+          </ul>
+        </div>
+
+        <div class="price-card featured" id="s5-pro">
+          <div class="featured-tag de-only">&#11088; Empfohlen</div>
+          <div class="featured-tag en-only">&#11088; Recommended</div>
+          <div class="plan-name" style="margin-top:0.75rem;">Pro</div>
+          <div class="plan-price">4<span style="font-size:1.4rem;">.99</span></div>
+          <div class="plan-unit de-only">EUR / Monat &nbsp;|&nbsp; <strong>47,99 EUR / Jahr</strong> (20% sparen)</div>
+          <div class="plan-unit en-only">EUR / month &nbsp;|&nbsp; <strong>47.99 EUR / year</strong> (save 20%)</div>
+          <ul class="plan-features">
+            <li class="de-only">Unbegrenzte Shops durchsuchen</li>
+            <li class="en-only">Unlimited shop browsing</li>
+            <li class="de-only">Vollstaendige interaktive Karte mit Zoom</li>
+            <li class="en-only">Full interactive map with zoom</li>
+            <li class="de-only">Wegbeschreibung zu Shops</li>
+            <li class="en-only">Directions to shops</li>
+            <li class="de-only">Priorisierte Produktanfragen</li>
+            <li class="en-only">Priority product requests</li>
+            <li class="de-only">Erweiterte Suche &amp; Filter</li>
+            <li class="en-only">Advanced search &amp; filters</li>
+            <li class="de-only">Exklusive Angebote &amp; Rabatte</li>
+            <li class="en-only">Exclusive deals &amp; discounts</li>
+            <li class="de-only">PRO-Abzeichen im Profil</li>
+            <li class="en-only">PRO badge on profile</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 id="s5-compare">
+        <span class="de-only">Detaillierter Vergleich</span>
+        <span class="en-only">Detailed Comparison</span>
+      </h3>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><span class="de-only">Funktion</span><span class="en-only">Feature</span></th>
+              <th><span class="badge badge-free">Free</span></th>
+              <th><span class="badge badge-pro">Pro</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="de-only">Registrierung &amp; Login</td>
+              <td class="en-only">Registration &amp; Login</td>
+              <td class="check">&#10003;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Shops durchsuchen</td>
+              <td class="en-only">Browse shops</td>
+              <td class="de-only">Max. 5</td>
+              <td class="en-only">Max. 5</td>
+              <td class="check de-only">Unbegrenzt</td>
+              <td class="check en-only">Unlimited</td>
+            </tr>
+            <tr>
+              <td class="de-only">Bewertungen schreiben</td>
+              <td class="en-only">Write reviews</td>
+              <td class="check">&#10003;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Produktanfragen senden</td>
+              <td class="en-only">Send product requests</td>
+              <td class="check">&#10003;</td>
+              <td class="de-only">&#10003; Priorisiert</td>
+              <td class="en-only">&#10003; Priority</td>
+            </tr>
+            <tr>
+              <td class="de-only">Karte (Vollzugriff)</td>
+              <td class="en-only">Map (full access)</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Wegbeschreibung</td>
+              <td class="en-only">Get Directions</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Erweiterte Suche</td>
+              <td class="en-only">Advanced search</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+            <tr>
+              <td class="de-only">Exklusive Angebote</td>
+              <td class="en-only">Exclusive deals</td>
+              <td class="cross">&#10007;</td>
+              <td class="check">&#10003;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 6: GUIDES ══════════════════════════════════════ -->
+    <section class="hb-section" id="s6" data-title-de="Anleitungen" data-title-en="Step-by-Step Guides">
+      <div class="section-header">
+        <div class="section-badge">6</div>
+        <h2>
+          <span class="de-only">Schritt-fuer-Schritt-Anleitungen</span>
+          <span class="en-only">Step-by-Step Guides</span>
+        </h2>
+      </div>
+
+      <h3 id="s6-register">
+        <span class="de-only">Registrierung &amp; Anmeldung</span>
+        <span class="en-only">Registration &amp; Login</span>
+      </h3>
+      <ol class="steps">
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Website aufrufen</div>
+            <div class="step-title en-only">Open the website</div>
+            <p class="step-desc de-only">Oeffne <strong>www.regiosync.eu</strong> in deinem Browser.</p>
+            <p class="step-desc en-only">Open <strong>www.regiosync.eu</strong> in your browser.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Rolle auswaehlen &amp; registrieren</div>
+            <div class="step-title en-only">Choose role &amp; register</div>
+            <p class="step-desc de-only">Klicke auf &ldquo;Registrieren&rdquo;. Waehle deine Rolle: <strong>Kaeufer</strong> (Standard) oder <strong>Verkaeufer</strong>. Gib Name, E-Mail und Passwort (mind. 8 Zeichen) ein.</p>
+            <p class="step-desc en-only">Click &ldquo;Sign Up&rdquo;. Select your role: <strong>Customer</strong> (default) or <strong>Seller</strong>. Enter name, email and password (min. 8 characters).</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">E-Mail bestaetigen &amp; anmelden</div>
+            <div class="step-title en-only">Confirm email &amp; sign in</div>
+            <p class="step-desc de-only">Bestaedige den Link in der Bestaedigungsmail, dann melde dich an. Du wirst automatisch zum Dashboard weitergeleitet.</p>
+            <p class="step-desc en-only">Confirm the link in the confirmation email, then sign in. You will be automatically redirected to the dashboard.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 id="s6-seller">
+        <span class="de-only">Shop erstellen (Verkaeufer)</span>
+        <span class="en-only">Create a Shop (Seller)</span>
+      </h3>
+      <ol class="steps">
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Verkaeufer-Dashboard oeffnen</div>
+            <div class="step-title en-only">Open the Seller Dashboard</div>
+            <p class="step-desc de-only">Nach dem Login wirst du automatisch zum Verkaeufer-Dashboard weitergeleitet.</p>
+            <p class="step-desc en-only">After signing in you are automatically redirected to the Seller Dashboard.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Shop erstellen &amp; Standort festlegen</div>
+            <div class="step-title en-only">Create shop &amp; set location</div>
+            <p class="step-desc de-only">Klicke auf <strong>Shop erstellen</strong>. Gib Name, Beschreibung ein, lade ein Bild hoch und setze den Standort per GPS oder manuell auf der Karte.</p>
+            <p class="step-desc en-only">Click <strong>Create Shop</strong>. Enter name, description, upload an image, and set the location via GPS or manually on the map.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Produkte hinzufuegen</div>
+            <div class="step-title en-only">Add products</div>
+            <p class="step-desc de-only">Oeffne deinen Shop und klicke auf <strong>Produkt hinzufuegen</strong>. Fuege Name, Preis, Kategorie, Menge, optionalen Rabatt und Bild hinzu.</p>
+            <p class="step-desc en-only">Open your shop and click <strong>Add Product</strong>. Add name, price, category, quantity, optional discount and image.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Anfragen beantworten</div>
+            <div class="step-title en-only">Respond to requests</div>
+            <p class="step-desc de-only">Eingehende Produktanfragen erscheinen unter <strong>Aktuelle Anfragen</strong>. Klicke auf <strong>Annehmen</strong> oder <strong>Ablehnen</strong>.</p>
+            <p class="step-desc en-only">Incoming product requests appear under <strong>Recent Requests</strong>. Click <strong>Accept</strong> or <strong>Reject</strong>.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 id="s6-buyer">
+        <span class="de-only">Produkte finden &amp; Anfragen stellen</span>
+        <span class="en-only">Find Products &amp; Send Requests</span>
+      </h3>
+      <ol class="steps">
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Shops entdecken</div>
+            <div class="step-title en-only">Discover shops</div>
+            <p class="step-desc de-only">Navigiere zu <strong>Shops</strong> und nutze die Suchleiste, um nach Shopname oder Standort zu suchen.</p>
+            <p class="step-desc en-only">Navigate to <strong>Shops</strong> and use the search bar to search by shop name or location.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Shop-Details &amp; Produkte ansehen</div>
+            <div class="step-title en-only">View shop details &amp; products</div>
+            <p class="step-desc de-only">Klicke auf einen Shop, um Produkte, Standort, Oeffnungsstatus und Bewertungen zu sehen.</p>
+            <p class="step-desc en-only">Click on a shop to view products, location, opening status and reviews.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Produktanfrage senden</div>
+            <div class="step-title en-only">Send a product request</div>
+            <p class="step-desc de-only">Klicke auf <strong>Produkt anfragen</strong>, beschreibe das gesuchte Produkt und sende die Anfrage ab.</p>
+            <p class="step-desc en-only">Click <strong>Request Product</strong>, describe the product you are looking for and submit.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-body">
+            <div class="step-title de-only">Bewertung schreiben</div>
+            <div class="step-title en-only">Write a review</div>
+            <p class="step-desc de-only">Auf der Shop-Detailseite unter <strong>Bewertungen</strong> deine Erfahrung teilen: Sterne vergeben und Text eingeben.</p>
+            <p class="step-desc en-only">On the shop detail page, under <strong>Reviews</strong>, share your experience: give stars and write text.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 id="s6-admin">
+        <span class="de-only">Admin-Verwaltung</span>
+        <span class="en-only">Admin Management</span>
+      </h3>
+      <p class="de-only">Das Admin-Panel ist ausschliesslich fuer Super-Administratoren zugaenglich unter <strong>/admin</strong>.</p>
+      <p class="en-only">The Admin Panel is exclusively accessible to super administrators at <strong>/admin</strong>.</p>
+      <ul>
+        <li class="de-only">Alle Nutzer anzeigen &ndash; Rollen per Dropdown aendern</li>
+        <li class="en-only">View all users &ndash; change roles via dropdown</li>
+        <li class="de-only">Nutzer sperren: Sperren-Symbol klicken (reversibel)</li>
+        <li class="en-only">Ban users: click the ban icon (reversible)</li>
+        <li class="de-only">Nutzer loeschen: Loeschen-Symbol + Bestaedigung (irreversibel)</li>
+        <li class="en-only">Delete users: delete icon + confirmation (irreversible)</li>
+        <li class="de-only">Berichte unter <strong>Reports</strong> einsehen und bearbeiten</li>
+        <li class="en-only">View and action reports under <strong>Reports</strong></li>
+      </ul>
+    </section>
+
+    <!-- ══ SECTION 7: RULES & OBLIGATIONS ═════════════════════════ -->
+    <section class="hb-section" id="s7" data-title-de="Regeln und Pflichten" data-title-en="Rules and Obligations">
+      <div class="section-header">
+        <div class="section-badge">7</div>
+        <h2>
+          <span class="de-only">Regeln, Pflichten &amp; Rechte</span>
+          <span class="en-only">Rules, Obligations &amp; Rights</span>
+        </h2>
+      </div>
+
+      <h3 id="s7-general">
+        <span class="de-only">Allgemeine Nutzungsregeln</span>
+        <span class="en-only">General Usage Rules</span>
+      </h3>
+      <ul>
+        <li class="de-only"><strong>Wahrhaftigkeit:</strong> Nur korrekte und wahrheitsgemasse Angaben machen</li>
+        <li class="en-only"><strong>Truthfulness:</strong> Only provide correct and truthful information</li>
+        <li class="de-only"><strong>Rechtmaessigkeit:</strong> Die Plattform nur fuer legale Zwecke nutzen</li>
+        <li class="en-only"><strong>Legality:</strong> Use the platform for lawful purposes only</li>
+        <li class="de-only"><strong>Verbotene Inhalte:</strong> Keine illegalen, beleidigenden oder irrefuehrenden Inhalte</li>
+        <li class="en-only"><strong>Prohibited content:</strong> No illegal, offensive or misleading content</li>
+        <li class="de-only"><strong>Respektvoller Umgang:</strong> Andere Nutzer respektvoll behandeln</li>
+        <li class="en-only"><strong>Respectful conduct:</strong> Treat other users respectfully</li>
+      </ul>
+
+      <div class="callout callout-danger">
+        <span class="callout-icon">&#128680;</span>
+        <div class="callout-body">
+          <strong class="de-only">Konsequenzen bei Verstoessen</strong>
+          <strong class="en-only">Consequences of violations</strong>
+          <span class="de-only">Bei Verstoss gegen diese Regeln kann der Anbieter den Zugang sofort sperren, das Konto loeschen und rechtliche Schritte einleiten.</span>
+          <span class="en-only">In case of violation, the provider may immediately suspend access, delete the account, and initiate legal proceedings.</span>
+        </div>
+      </div>
+
+      <h3 id="s7-seller">
+        <span class="de-only">Besondere Regeln fuer Verkaeufer</span>
+        <span class="en-only">Special Rules for Sellers</span>
+      </h3>
+      <ul>
+        <li class="de-only"><strong>Produktwahrhaftigkeit:</strong> Nur tatsaechlich verfuegbare Produkte anbieten</li>
+        <li class="en-only"><strong>Product truthfulness:</strong> Only list actually available products</li>
+        <li class="de-only"><strong>Preisklarheit:</strong> Preise inkl. MwSt. angeben</li>
+        <li class="en-only"><strong>Price transparency:</strong> Prices must include VAT</li>
+        <li class="de-only"><strong>Standortgenauigkeit:</strong> Shopstandort muss dem tatsaechlichen Verkaufsort entsprechen</li>
+        <li class="en-only"><strong>Location accuracy:</strong> Shop location must correspond to the actual sales location</li>
+        <li class="de-only"><strong>Reaktionszeit:</strong> Produktanfragen innerhalb von 48 Stunden beantworten</li>
+        <li class="en-only"><strong>Response time:</strong> Answer product requests within 48 hours</li>
+      </ul>
+
+      <h3 id="s7-gdpr">
+        <span class="de-only">Datenschutz &amp; Deine Rechte (DSGVO)</span>
+        <span class="en-only">Data Protection &amp; Your Rights (GDPR)</span>
+      </h3>
+      <p class="de-only">RegioSync verarbeitet personenbezogene Daten gemaess der DSGVO (EU 2016/679). Alle Daten werden verschluesselt auf europaeischen Servern gespeichert.</p>
+      <p class="en-only">RegioSync processes personal data in accordance with the GDPR (EU 2016/679). All data is stored encrypted on European servers.</p>
+      <p class="de-only"><strong>Deine DSGVO-Rechte:</strong> Auskunft (Art. 15), Berichtigung (Art. 16), Loeschung (Art. 17), Einschraenkung (Art. 18), Datenuebertragbarkeit (Art. 20), Widerspruch (Art. 21).</p>
+      <p class="en-only"><strong>Your GDPR rights:</strong> Access (Art. 15), Rectification (Art. 16), Erasure (Art. 17), Restriction (Art. 18), Portability (Art. 20), Objection (Art. 21).</p>
       <p>
-        RegioSync ist eine webbasierte SaaS-Plattform, die lokale Erzeuger, Handwerker und regionale Produzenten direkt mit K&auml;ufern in ihrer Region verbindet. Angeboten als Mehrsprachige App (Deutsch &amp; Englisch) mit Free- und Pro-Plan.
+        <span class="de-only">Anfragen an: </span>
+        <span class="en-only">Contact: </span>
+        <a href="mailto:info@regiosync.eu">info@regiosync.eu</a>
       </p>
-      <div class="card">
-        <strong>Was RegioSync l&ouml;st:</strong> Fehlender Direktzugang zu regionalen Produkten. RegioSync eliminiert Zwischenh&auml;ndler und verbindet Verbraucher direkt mit lokalen Produzenten &ndash; transparent, nachhaltig und regional.
+    </section>
+
+    <!-- ══ SECTION 8: FAQ ═════════════════════════════════════════ -->
+    <section class="hb-section" id="s8" data-title-de="FAQ" data-title-en="FAQ">
+      <div class="section-header">
+        <div class="section-badge">8</div>
+        <h2>
+          <span class="de-only">Haeufig gestellte Fragen</span>
+          <span class="en-only">Frequently Asked Questions</span>
+        </h2>
       </div>
-      <div class="feature-grid">
-        <!-- Copilot fills these cards based on actual implemented features -->
-        <div class="feature-card">
-          <div class="feature-icon">&#127970;</div>
-          <div class="feature-title">Regionale L&auml;den</div>
-          <div class="feature-desc">Entdecke lokale Bauernhöfe, Handwerksbetriebe und regionale Produzenten in deiner N&auml;he.</div>
+
+      <h3 class="de-only">Kann ich RegioSync kostenlos nutzen?</h3>
+      <h3 class="en-only">Can I use RegioSync for free?</h3>
+      <p class="de-only">Ja. Der Free-Tarif ist dauerhaft kostenlos mit eingeschraenkten Funktionen (max. 5 Shops, keine Kartensteuerung).</p>
+      <p class="en-only">Yes. The Free plan is permanently free with limited features (max. 5 shops, no map controls).</p>
+
+      <hr />
+
+      <h3 class="de-only">Wie aendere ich meine Rolle von Kaeufer zu Verkaeufer?</h3>
+      <h3 class="en-only">How do I change my role from buyer to seller?</h3>
+      <p class="de-only">Rollenberechtigungen werden von einem Administrator vergeben. Kontaktiere uns unter <a href="mailto:info@regiosync.eu">info@regiosync.eu</a>.</p>
+      <p class="en-only">Role permissions are assigned by an administrator. Contact us at <a href="mailto:info@regiosync.eu">info@regiosync.eu</a>.</p>
+
+      <hr />
+
+      <h3 class="de-only">Wie kann ich mein Passwort zuruecksetzen?</h3>
+      <h3 class="en-only">How do I reset my password?</h3>
+      <p class="de-only">Klicke auf der Login-Seite auf <strong>Passwort vergessen?</strong> und gib deine E-Mail-Adresse ein. Du erhaeltst einen Reset-Link.</p>
+      <p class="en-only">On the login page, click <strong>Forgot Password?</strong> and enter your email address. You will receive a reset link.</p>
+
+      <hr />
+
+      <h3 class="de-only">Gibt es eine mobile App?</h3>
+      <h3 class="en-only">Is there a mobile app?</h3>
+      <p class="de-only">Nein. RegioSync ist eine vollstaendig responsive Webanwendung &ndash; kein App-Download erforderlich.</p>
+      <p class="en-only">No. RegioSync is a fully responsive web application &ndash; no app download required.</p>
+
+      <hr />
+
+      <h3 class="de-only">Wie sicher sind meine Daten?</h3>
+      <h3 class="en-only">How secure is my data?</h3>
+      <p class="de-only">RegioSync nutzt HTTPS/TLS-Verschluesselung, Supabase Auth, regelmassige Sicherheitsupdates und Row-Level Security (RLS) auf Datenbankebene.</p>
+      <p class="en-only">RegioSync uses HTTPS/TLS encryption, Supabase Auth, regular security updates, and Row-Level Security (RLS) at the database level.</p>
+
+      <hr />
+
+      <h3 class="de-only">Wie kann ich mein Konto loeschen?</h3>
+      <h3 class="en-only">How can I delete my account?</h3>
+      <p class="de-only">Zur Kontoloeschung wende dich an <a href="mailto:info@regiosync.eu">info@regiosync.eu</a>. Alle personenbezogenen Daten werden gemaess DSGVO Art. 17 geloescht.</p>
+      <p class="en-only">To delete your account, contact <a href="mailto:info@regiosync.eu">info@regiosync.eu</a>. All personal data is deleted per GDPR Art. 17.</p>
+
+      <hr />
+
+      <h3 class="de-only">In welchen Sprachen ist RegioSync verfuegbar?</h3>
+      <h3 class="en-only">In which languages is RegioSync available?</h3>
+      <p class="de-only">RegioSync ist vollstaendig in <strong>Deutsch</strong> und <strong>Englisch</strong> verfuegbar. Die Sprache kann jederzeit oben rechts umgestellt werden.</p>
+      <p class="en-only">RegioSync is fully available in <strong>German</strong> and <strong>English</strong>. The language can be changed at any time in the top right.</p>
+    </section>
+
+    <!-- ══ SECTION 9: LEGAL ═══════════════════════════════════════ -->
+    <section class="hb-section" id="s9" data-title-de="Rechtliches" data-title-en="Legal">
+      <div class="section-header">
+        <div class="section-badge">9</div>
+        <h2>
+          <span class="de-only">Rechtliche Informationen</span>
+          <span class="en-only">Legal Information</span>
+        </h2>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4 class="de-only">&#128216; Impressum</h4>
+          <h4 class="en-only">&#128216; Imprint</h4>
+          <p style="font-size:0.85rem;">
+            WAMOCON GmbH<br />
+            Mergenthalerallee 79&ndash;81<br />
+            65760 Eschborn, Deutschland<br />
+            Tel: +49 6196 5838311<br />
+            <a href="mailto:info@regiosync.eu">info@regiosync.eu</a>
+          </p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#128205;</div>
-          <div class="feature-title">Interaktive Karte</div>
-          <div class="feature-desc">Finde L&auml;den in Echtzeit auf der interaktiven Karte &ndash; mit Routenplanung f&uuml;r Pro-Nutzer.</div>
+        <div class="card">
+          <h4 class="de-only">&#128220; Unternehmen</h4>
+          <h4 class="en-only">&#128220; Company</h4>
+          <p style="font-size:0.85rem;">
+            <span class="de-only">GF: Dipl.-Ing. Waleri Moretz</span>
+            <span class="en-only">MD: Dipl.-Ing. Waleri Moretz</span><br />
+            HRB 123666<br />
+            <span class="de-only">USt-ID: DE344930486</span>
+            <span class="en-only">VAT: DE344930486</span>
+          </p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#11088;</div>
-          <div class="feature-title">Bewertungen</div>
-          <div class="feature-desc">Authentische Bewertungen aus der Community &ndash; hilf anderen, die besten regionalen Anbieter zu finden.</div>
+        <div class="card">
+          <h4 class="de-only">&#128274; Datenschutz</h4>
+          <h4 class="en-only">&#128274; Privacy</h4>
+          <p style="font-size:0.85rem;">
+            <a href="https://www.regiosync.eu/de/privacy" class="de-only">Datenschutzerklaerung ansehen &rarr;</a>
+            <a href="https://www.regiosync.eu/en/privacy" class="en-only">View Privacy Policy &rarr;</a>
+          </p>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#128276;</div>
-          <div class="feature-title">Benachrichtigungen</div>
-          <div class="feature-desc">Bleibe informiert &uuml;ber neue Produkte, Shops und Aktivit&auml;ten in deiner Region.</div>
+        <div class="card">
+          <h4 class="de-only">&#128220; AGB</h4>
+          <h4 class="en-only">&#128220; Terms &amp; Conditions</h4>
+          <p style="font-size:0.85rem;">
+            <a href="https://www.regiosync.eu/de/terms" class="de-only">AGB ansehen &rarr;</a>
+            <a href="https://www.regiosync.eu/en/terms" class="en-only">View Terms &rarr;</a>
+          </p>
         </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Nutzerrolle</th><th>Beschreibung</th></tr></thead>
-          <tbody>
-            <!-- Copilot updates rows to reflect actual roles -->
-            <tr><td><strong>Free-Nutzer</strong></td><td>Zugriff auf bis zu 5 regionale L&auml;den, einfache Kartenansicht ohne Zoom, Produktlisten anzeigen, Bewertungen schreiben, Produktw&uuml;nsche senden.</td></tr>
-            <tr><td><strong>Pro-Nutzer</strong></td><td>Unlimitierter Zugriff auf alle L&auml;den, vollst&auml;ndige interaktive Karte mit Zoom und Routenplanung, erweiterte Suche, exklusive Angebote und Fr&uuml;hzugang zu neuen L&auml;den.</td></tr>
-            <tr><td><strong>Verk&auml;ufer (Seller)</strong></td><td>Eigene L&auml;den und Produkte verwalten, Produktw&uuml;nsche annehmen oder ablehnen, Bewertungen einsehen.</td></tr>
-            <tr><td><strong>Admin (WAMOCON)</strong></td><td>Nutzerverwaltung, Rollen&auml;nderung, Sperren/Entsperren von Konten, Berichte einsehen und bearbeiten.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
 
-    <!-- ── 2. Funktionen ──────────────────────────────────────────── -->
-    <section id="features">
-      <h2><span class="num">02</span> Funktionen</h2>
-
-      <h3 id="feature-list">2.1 Feature-Liste</h3>
-      <p>RegioSync bietet eine vollst&auml;ndige Plattform f&uuml;r den regionalen Handel. Die Funktionen sind in zwei Pl&auml;nen verf&uuml;gbar: <strong>Free</strong> (kostenlos) und <strong>Pro</strong> (Abonnement). Alle Nutzer ben&ouml;tigen ein Konto.</p>
-      <div class="info-box">
-        <div class="info-box-title">Hinweis</div>
-        <p>Diese Liste wird von Copilot automatisch aktualisiert, wenn neue Features implementiert werden.</p>
-      </div>
-
-      <h3 id="plaene">2.2 Pl&auml;ne &amp; Preise</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Feature</th><th>Free</th><th>Pro (&euro;4,99/Monat oder &euro;47,99/Jahr)</th></tr></thead>
-          <tbody>
-            <tr><td>Bis zu 5 regionale L&auml;den durchsuchen</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Einfache Kartenansicht</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Produktlisten anzeigen</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Bewertungen schreiben</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Produktw&uuml;nsche senden</td><td class="yes">&#10003;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Unlimitierter Shop-Zugriff</td><td class="no">&#10007;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Interaktive Karte mit Zoom &amp; Navigation</td><td class="no">&#10007;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Routenplanung zu L&auml;den</td><td class="no">&#10007;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Erweiterte Suche &amp; Filter</td><td class="no">&#10007;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Exklusive Angebote &amp; Rabatte</td><td class="no">&#10007;</td><td class="yes">&#10003;</td></tr>
-            <tr><td>Fr&uuml;hzugang zu neuen L&auml;den</td><td class="no">&#10007;</td><td class="yes">&#10003;</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── 3. Erste Schritte (Tutorials) ─────────────────────────── -->
-    <section id="tutorials">
-      <h2><span class="num">03</span> Erste Schritte</h2>
-
-      <h3 id="tut-konto">3.1 Konto erstellen</h3>
-      <ol>
-        <li><code>/en/register</code> oder <code>/de/register</code> aufrufen</li>
-        <li>Vollst&auml;ndigen Namen, E-Mail-Adresse und Passwort (min. 6 Zeichen) eingeben</li>
-        <li>Rolle ausw&auml;hlen: <strong>Nutzer</strong> (einkaufen) oder <strong>Verk&auml;ufer</strong> (Laden er&ouml;ffnen)</li>
-        <li><strong>&bdquo;Konto erstellen&ldquo;</strong> klicken</li>
-        <li>Best&auml;tigungslink in der E-Mail anklicken (falls E-Mail-Verifizierung aktiv)</li>
-        <li>Weiterleitung zum Dashboard</li>
-      </ol>
-
-      <h3 id="tut-start">3.2 Loslegen</h3>
-      <ol>
-        <li>Nach dem Login zum <strong>Dashboard</strong> weitergeleitet werden (automatisch je nach Rolle)</li>
-        <li><strong>Nutzer:</strong> Unter <code>/shops</code> regionale L&auml;den entdecken und filtern</li>
-        <li><strong>Verk&auml;ufer:</strong> Unter <code>/seller/shops/new</code> ersten Laden anlegen (Name, Beschreibung, Adresse, GPS-Koordinaten)</li>
-        <li>Karte unter <code>/map</code> &ouml;ffnen und L&auml;den in der N&auml;he visualisieren</li>
-        <li>Profil unter <code>/profile</code> vervollst&auml;ndigen und auf Pro upgraden</li>
-      </ol>
-
-      <h3 id="tut-upgrade">3.3 Auf Pro upgraden</h3>
-      <ol>
-        <li>Im Profil-Bereich auf <strong>&bdquo;Auf Pro upgraden&ldquo;</strong> klicken (unter <code>/profile</code>)</li>
-        <li>Plan-Auswahl: monatlich (&euro;4,99/Monat) oder j&auml;hrlich (&euro;47,99/Jahr, 20% Ersparnis)</li>
-        <li>Nach Zahlung: automatische Aktivierung des Pro-Status</li>
-        <li>Pro-Badge erscheint im Profil und alle Premium-Funktionen werden freigeschaltet</li>
-      </ol>
-    </section>
-
-    <!-- ── 4. How-to Guides ───────────────────────────────────────── -->
-    <section id="howto">
-      <h2><span class="num">04</span> How-to Guides</h2>
-
-      <h3 id="ht-profil">4.1 Profil &amp; Abonnement verwalten</h3>
-      <ol>
-        <li><code>/[locale]/profil</code> aufrufen</li>
-        <li>Stammdaten (Name, E-Mail) &auml;ndern &rarr; <strong>&bdquo;Speichern&ldquo;</strong></li>
-        <li>Passwort &auml;ndern &rarr; Best&auml;tigungs-E-Mail wird versandt</li>
-        <li>Abo-Status und n&auml;chstes Abrechnungsdatum einsehen</li>
-        <li>Zahlungsmethode &auml;ndern &rarr; Weiterleitung zum Stripe Customer Portal</li>
-        <li>Pro-Abo k&uuml;ndigen &rarr; Weiterleitung zum Stripe Customer Portal (K&uuml;ndigung zum Periodenende)</li>
-      </ol>
-
-      <h3 id="ht-loeschen">4.2 Konto l&ouml;schen (DSGVO)</h3>
-      <ol>
-        <li><code>/[locale]/profil</code> aufrufen &rarr; Abschnitt <strong>&bdquo;Konto l&ouml;schen&ldquo;</strong></li>
-        <li>Best&auml;tigungsdialog &ouml;ffnet sich &ndash; Vorgang ist <strong>nicht r&uuml;ckg&auml;ngig zu machen</strong></li>
-        <li>Best&auml;tigung eingeben und <strong>&bdquo;Konto unwiderruflich l&ouml;schen&ldquo;</strong> klicken</li>
-        <li>Alle personenbezogenen Daten werden gel&ouml;scht (DSGVO Art. 17)</li>
-        <li>Aktives Pro-Abo wird bei Stripe sofort gek&uuml;ndigt</li>
-      </ol>
-
-      <div class="warn-box">
-        <div class="warn-box-title">Unumkehrbarer Vorgang</div>
-        <p>Die Konto-L&ouml;schung kann nicht r&uuml;ckg&auml;ngig gemacht werden. Alle Daten werden dauerhaft entfernt.</p>
-      </div>
-    </section>
-
-    <!-- ── 5. Funktionsreferenz ───────────────────────────────────── -->
-    <section id="referenz">
-      <h2><span class="num">05</span> Funktionsreferenz</h2>
-
-      <h3 id="routen">5.1 Routen-&Uuml;bersicht</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Route</th><th>Beschreibung</th><th>Zugriff</th></tr></thead>
-          <tbody>
-            <tr><td><code>/[locale]</code></td><td>Startseite / Marketing-Landingpage</td><td>Alle</td></tr>
-            <tr><td><code>/[locale]/login</code></td><td>Anmeldung</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/register</code></td><td>Registrierung (Nutzer / Verk&auml;ufer)</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/forgot-password</code></td><td>Passwort zur&uuml;cksetzen</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/pricing</code></td><td>Preise &amp; Pl&auml;ne</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/help</code></td><td>Hilfe &amp; FAQ</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/imprint</code></td><td>Impressum</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/privacy</code></td><td>Datenschutzerkl&auml;rung</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/terms</code></td><td>AGB</td><td>&Ouml;ffentlich</td></tr>
-            <tr><td><code>/[locale]/dashboard</code></td><td>Rollenweiterleitung (Admin / Seller / User)</td><td>Eingeloggt</td></tr>
-            <tr><td><code>/[locale]/shops</code></td><td>Shop-Verzeichnis (Free: max. 5)</td><td>Eingeloggt</td></tr>
-            <tr><td><code>/[locale]/shops/[id]</code></td><td>Shop-Detailansicht, Bewertungen, Produktw&uuml;nsche</td><td>Eingeloggt</td></tr>
-            <tr><td><code>/[locale]/map</code></td><td>Interaktive Karte aller L&auml;den</td><td>Eingeloggt</td></tr>
-            <tr><td><code>/[locale]/profile</code></td><td>Profil verwalten, Pro-Upgrade</td><td>Eingeloggt</td></tr>
-            <tr><td><code>/[locale]/notifications</code></td><td>Benachrichtigungen</td><td>Eingeloggt</td></tr>
-            <tr><td><code>/[locale]/seller/dashboard</code></td><td>Seller-Dashboard: L&auml;den, Produkte, Anfragen</td><td>Seller</td></tr>
-            <tr><td><code>/[locale]/seller/shops/new</code></td><td>Neuen Laden erstellen</td><td>Seller</td></tr>
-            <tr><td><code>/[locale]/seller/shops/[id]</code></td><td>Laden verwalten, Produkte hinzuf&uuml;gen</td><td>Seller (Besitzer)</td></tr>
-            <tr><td><code>/[locale]/admin</code></td><td>Admin-Dashboard: Nutzer, Berichte</td><td>Super Admin</td></tr>
-            <tr><td><code>/api/admin/delete-user</code></td><td>Auth-Nutzer l&ouml;schen (Service Role)</td><td>Super Admin (intern)</td></tr>
-            <tr><td><code>/auth/callback</code></td><td>OAuth / E-Mail-Verifizierungs-Callback</td><td>System</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 id="api">5.2 API &amp; Hooks</h3>
-      <div class="info-box">
-        <div class="info-box-title">Lebende Dokumentation</div>
-        <p>Copilot erg&auml;nzt diese Tabelle automatisch, wenn neue API-Routen oder Hooks hinzugef&uuml;gt werden.</p>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Endpunkt / Hook</th><th>Methode</th><th>Beschreibung</th><th>Zugriff</th></tr></thead>
-          <tbody>
-            <tr><td><code>/api/admin/delete-user</code></td><td>DELETE</td><td>Nutzer aus auth.users l&ouml;schen (Service Role Key)</td><td>Super Admin</td></tr>
-            <tr><td><code>/auth/callback</code></td><td>GET</td><td>Supabase OAuth Code-Exchange, Weiterleitung nach Login</td><td>System</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── 6. Technische Architektur ──────────────────────────────── -->
-    <section id="tech">
-      <h2><span class="num">06</span> Technische Architektur</h2>
-
-      <h3 id="tech-stack">6.1 Stack</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Schicht</th><th>Technologie</th><th>Aufgabe</th></tr></thead>
-          <tbody>
-            <tr><td>Frontend &amp; Backend</td><td>Next.js 16 (App Router), TypeScript</td><td>SSR, API-Routen, Middleware</td></tr>
-            <tr><td>Styling</td><td>Tailwind CSS v4</td><td>Utility-First, Dark/Light Mode</td></tr>
-            <tr><td>Datenbank &amp; Auth</td><td>Supabase (PostgreSQL, RLS)</td><td>Schema <code>public</code></td></tr>
-            <tr><td>i18n</td><td>next-intl v4</td><td>Deutsch (prim&auml;r) &amp; Englisch</td></tr>
-            <tr><td>Payment</td><td>Stripe</td><td>Abonnement, Customer Portal</td></tr>
-            <tr><td>E-Mail</td><td>Resend</td><td>Transaktions-E-Mails, Benachrichtigungen</td></tr>
-            <tr><td>Tests</td><td>Vitest, Testing Library</td><td>Unit-Tests, Coverage-Threshold</td></tr>
-            <tr><td>CI/CD</td><td>GitHub Actions</td><td>Tests, Lint, Typecheck, Vercel Deploy</td></tr>
-            <tr><td>Hosting</td><td>Vercel (Frontend), Supabase EU-Frankfurt</td><td>DSGVO-konforme EU-Region</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 id="tech-schema">6.2 Datenbank-Schema</h3>
-      <p>Supabase-Schema: <code>public</code>. Row Level Security (RLS) ist auf allen Tabellen aktiv.</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Tabelle</th><th>Inhalt</th><th>RLS</th></tr></thead>
-          <tbody>
-            <tr><td><code>profiles</code></td><td>Nutzerprofile: Name, E-Mail, Rolle, is_pro, is_banned</td><td>Eigener Datensatz les-/schreibbar; Admins voll</td></tr>
-            <tr><td><code>shops</code></td><td>L&auml;den: Name, Beschreibung, Adresse, GPS, owner_id</td><td>Alle lesen; Seller bearbeiten eigene</td></tr>
-            <tr><td><code>products</code></td><td>Produkte: Name, Preis, Kategorie, Menge, Rabatt, Verf&uuml;gbarkeit</td><td>Alle lesen; Shop-Besitzer bearbeiten</td></tr>
-            <tr><td><code>reviews</code></td><td>Bewertungen: Rating (1-5), Kommentar, user_id, shop_id</td><td>Alle lesen; Eigene schreiben</td></tr>
-            <tr><td><code>product_requests</code></td><td>Produktw&uuml;nsche: Titel, Beschreibung, Status, user_id, shop_id</td><td>Eigene lesen/erstellen; Seller bearbeiten</td></tr>
-            <tr><td><code>notifications</code></td><td>Benachrichtigungen: Typ, Titel, Nachricht, gelesen-Status</td><td>Nur eigene Benachrichtigungen</td></tr>
-            <tr><td><code>reports</code></td><td>Meldungen von Nutzern &uuml;ber L&auml;den oder Profile</td><td>Eigene erstellen; Admins voll</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── 7. CI/CD & Tests ───────────────────────────────────────── -->
-    <section id="ci-cd">
-      <h2><span class="num">07</span> CI/CD &amp; Tests</h2>
-      <p>Jeder Code-Push durchl&auml;uft automatisch Qualit&auml;ts-Gates. Ein Vercel-Deployment erfolgt nur bei Pull Requests (Preview) oder Merge in <code>main</code> (Produktion).</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Workflow</th><th>Trigger</th><th>Befehl</th></tr></thead>
-          <tbody>
-            <!-- Copilot updates this table when GitHub Actions workflows change -->
-            <tr><td><code>deploy.yml</code></td><td>Manuell (workflow_dispatch)</td><td>Vercel Production/Preview Deploy</td></tr>
-            <tr><td><code>pr-pipeline.yml</code></td><td>Pull Request &rarr; main</td><td>Typecheck, Lint, Build, Tests</td></tr>
-            <tr><td><code>docs.yml</code></td><td>Push &rarr; main (docs/)</td><td>GitHub Pages (dieses Handbuch)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── 8. DSGVO & Compliance ──────────────────────────────────── -->
-    <section id="compliance">
-      <h2><span class="num">08</span> DSGVO &amp; Compliance</h2>
-      <p>RegioSync verarbeitet personenbezogene Daten ausschlie&szlig;lich in der EU (Supabase, Region Frankfurt). Alle Verarbeitungen sind nach DSGVO dokumentiert.</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>DSGVO-Anforderung</th><th>Umsetzung</th></tr></thead>
-          <tbody>
-            <tr><td>Recht auf Auskunft (Art. 15)</td><td>Profil-Seite zeigt alle gespeicherten Daten</td></tr>
-            <tr><td>Recht auf L&ouml;schung (Art. 17)</td><td>Konto-L&ouml;schung im Profil, sofortige Datenlöschung inkl. Stripe-K&uuml;ndigung</td></tr>
-            <tr><td>Datenportabilit&auml;t (Art. 20)</td><td>Datenexport (JSON) im Profil</td></tr>
-            <tr><td>Cookie-Einwilligung</td><td>Cookie-Banner mit Opt-in bei erstem Besuch</td></tr>
-            <tr><td>Datensicherheit (Art. 32)</td><td>RLS auf allen Supabase-Tabellen, HTTPS, kein Client-seitiges Secret</td></tr>
-            <tr><td>Impressum &amp; Datenschutzerkl&auml;rung</td><td>Verf&uuml;gbar unter <code>/[locale]/imprint</code> und <code>/[locale]/privacy</code></td></tr>
-            <tr><td>AGB</td><td>Verf&uuml;gbar unter <code>/[locale]/terms</code></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── 9. Glossar ─────────────────────────────────────────────── -->
-    <section id="glossar">
-      <h2><span class="num">09</span> Glossar</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Begriff</th><th>Erkl&auml;rung</th></tr></thead>
-          <tbody>
-            <!-- Copilot extends this glossary with domain-specific terms as features are added -->
-            <tr><td><strong>RLS</strong></td><td>Row Level Security &ndash; Datenbankebenen-Zugriffsschutz in Supabase/PostgreSQL</td></tr>
-            <tr><td><strong>SSR</strong></td><td>Server-Side Rendering &ndash; Seitenrendering auf dem Server (Next.js App Router Standard)</td></tr>
-            <tr><td><strong>SaaS</strong></td><td>Software as a Service &ndash; webbasierte Software, die als Abonnement bereitgestellt wird</td></tr>
-            <tr><td><strong>WAMOCON</strong></td><td>WAMOCON GmbH &ndash; Betreiber und Entwickler von RegioSync</td></tr>
-            <tr><td><strong>Feature-Gate</strong></td><td>Serverseitiger Mechanismus, der Pro-Funktionen f&uuml;r Free-Nutzer sperrt</td></tr>
-            <tr><td><strong>CAC</strong></td><td>Customer Acquisition Cost &ndash; Kosten zur Gewinnung eines neuen Kunden</td></tr>
-          </tbody>
-        </table>
+      <div class="callout callout-info">
+        <span class="callout-icon">&#8505;</span>
+        <div class="callout-body">
+          <strong class="de-only">Anwendbares Recht</strong>
+          <strong class="en-only">Applicable Law</strong>
+          <span class="de-only">Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist Eschborn. Der Betrieb erfolgt gemaess DSGVO (EU 2016/679).</span>
+          <span class="en-only">German law applies. Place of jurisdiction is Eschborn. The platform is operated in accordance with GDPR (EU 2016/679).</span>
+        </div>
       </div>
     </section>
 
   </main>
 </div>
 
-<!-- ── Footer ───────────────────────────────────────────────────────── -->
-<footer class="page-footer">
-  <div>&copy; 2026 WAMOCON GmbH &ndash; Alle Rechte vorbehalten</div>
-  <div>RegioSync Produkthandbuch v0.1.0 &middot; Vertraulich &middot; Mai 2026</div>
-</footer>
+<!-- ══ HANDBOOK FOOTER ═══════════════════════════════════════════════ -->
+<div class="hb-footer no-print">
+  <div class="hb-footer-meta">
+    <span class="de-only">Version 0.1.0 &mdash; RegioSync von WAMOCON GmbH</span>
+    <span class="en-only">Version 0.1.0 &mdash; RegioSync by WAMOCON GmbH</span>
+    <br />
+    <span class="de-only">Fragen? Schreib uns: </span>
+    <span class="en-only">Questions? Write us: </span>
+    <a href="mailto:info@regiosync.eu">info@regiosync.eu</a>
+  </div>
+  <div class="hb-footer-actions">
+    <button class="btn-pdf" id="download-btn" onclick="downloadPDF()">
+      &#11015; <span class="de-only">Als PDF herunterladen</span><span class="en-only">Download as PDF</span>
+    </button>
+    <button class="btn-print" onclick="window.print()">
+      &#128438; <span class="de-only">Drucken</span><span class="en-only">Print</span>
+    </button>
+  </div>
+</div>
 
-<!-- ── Smooth active TOC highlighting ───────────────────────────────── -->
+<!-- ══ SCRIPTS ═══════════════════════════════════════════════════════ -->
 <script>
-  (function () {
-    const links = document.querySelectorAll('.toc-link');
-    const sections = document.querySelectorAll('section[id], .cover');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            links.forEach((l) => l.style.removeProperty('color'));
-            const active = document.querySelector('.toc-link[href="#' + entry.target.id + '"]');
-            if (active) active.style.color = 'var(--primary)';
-          }
-        });
-      },
-      { rootMargin: '-20% 0px -70% 0px' }
-    );
-    sections.forEach((s) => observer.observe(s));
+  /* ── Language toggle ── */
+  function setLang(lang) {
+    document.documentElement.setAttribute("data-lang", lang);
+    document.getElementById("btn-de").classList.toggle("active", lang === "de");
+    document.getElementById("btn-en").classList.toggle("active", lang === "en");
+    localStorage.setItem("rs-hb-lang", lang);
+  }
+
+  /* ── Theme toggle ── */
+  function toggleTheme() {
+    var cur = document.documentElement.getAttribute("data-theme");
+    var next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    document.getElementById("theme-icon").textContent = next === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19";
+    localStorage.setItem("rs-hb-theme", next);
+  }
+
+  /* ── Search ── */
+  document.getElementById("search-input").addEventListener("input", function() {
+    var q = this.value.toLowerCase().trim();
+    var sections = document.querySelectorAll(".hb-section");
+    var tocSections = document.querySelectorAll(".toc-section");
+    var noResults = document.getElementById("search-no-results");
+    var found = 0;
+
+    sections.forEach(function(section) {
+      var text = section.textContent.toLowerCase();
+      var match = !q || text.indexOf(q) !== -1;
+      section.classList.toggle("hidden", !match);
+      if (match) found++;
+
+      var id = section.id;
+      var tocEl = document.querySelector(".toc-section[data-section='" + id + "']");
+      if (tocEl) tocEl.classList.toggle("hidden", !match);
+    });
+
+    noResults.style.display = (q && found === 0) ? "block" : "none";
+
+    if (q && found > 0) {
+      var first = document.querySelector(".hb-section:not(.hidden)");
+      if (first) first.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  /* ── TOC active section via IntersectionObserver ── */
+  var tocLinks = document.querySelectorAll(".toc-section[data-section]");
+
+  function setActive(id) {
+    tocLinks.forEach(function(el) {
+      var active = el.dataset.section === id;
+      var mainLink = el.querySelector(".toc-main");
+      if (mainLink) mainLink.classList.toggle("active", active);
+    });
+  }
+
+  if ("IntersectionObserver" in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    }, { rootMargin: "-10% 0px -70% 0px" });
+
+    document.querySelectorAll(".hb-section").forEach(function(s) {
+      observer.observe(s);
+    });
+  }
+
+  /* ── PDF download ── */
+  function downloadPDF() {
+    var btn = document.getElementById("download-btn");
+    btn.disabled = true;
+    btn.textContent = "Generating PDF...";
+
+    /* Show PDF-only elements */
+    document.querySelectorAll(".pdf-only").forEach(function(el) {
+      el.style.display = "block";
+    });
+
+    var lang = document.documentElement.getAttribute("data-lang") || "de";
+    var filename = lang === "de" ? "RegioSync-Produkthandbuch.pdf" : "RegioSync-Product-Manual.pdf";
+
+    var element = document.getElementById("hb-main");
+
+    var opt = {
+      margin:      [12, 12, 12, 12],
+      filename:    filename,
+      image:       { type: "jpeg", quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF:       { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak:   { mode: ["avoid-all", "css", "legacy"], before: ".hb-section" }
+    };
+
+    html2pdf().set(opt).from(element).save().then(function() {
+      document.querySelectorAll(".pdf-only").forEach(function(el) {
+        el.style.display = "";
+      });
+      btn.disabled = false;
+      btn.innerHTML = "&#11015; <span class=\"de-only\">Als PDF herunterladen</span><span class=\"en-only\">Download as PDF</span>";
+      /* Reapply language to restored button */
+      var lang2 = document.documentElement.getAttribute("data-lang");
+      if (lang2 === "en") {
+        btn.querySelector(".de-only").style.display = "none";
+      } else {
+        btn.querySelector(".en-only").style.display = "none";
+      }
+    }).catch(function() {
+      document.querySelectorAll(".pdf-only").forEach(function(el) {
+        el.style.display = "";
+      });
+      btn.disabled = false;
+      btn.textContent = "Download as PDF";
+    });
+  }
+
+  /* ── Init ── */
+  (function() {
+    var lang = localStorage.getItem("rs-hb-lang") || "de";
+    var theme = localStorage.getItem("rs-hb-theme") || "dark";
+    setLang(lang);
+    document.documentElement.setAttribute("data-theme", theme);
+    document.getElementById("theme-icon").textContent = theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19";
+    setActive("s1");
   })();
 </script>
 
