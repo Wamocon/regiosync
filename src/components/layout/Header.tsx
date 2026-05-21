@@ -30,9 +30,12 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 glass border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        {/* Grid: [logo] [nav – 1fr, centered] [controls]
+            Left and right columns are sized to content so they never shift
+            when the nav text changes length on language switch. */}
+        <div className="grid grid-cols-[auto_1fr_auto] items-center h-16 gap-2">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <ShoppingBag className="w-5 h-5 text-white" />
             </div>
@@ -42,41 +45,41 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
             )}
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            <Link href="/" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors">
+          {/* Desktop Nav - centred in the 1fr column */}
+          <nav className="hidden md:flex items-center justify-center gap-1">
+            <Link href="/" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
               {t('nav.home')}
             </Link>
             {user && userRole === 'super_admin' && (
-              <Link href="/admin" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors">
+              <Link href="/admin" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
                 {t('nav.admin')}
               </Link>
             )}
             {user && userRole === 'seller' && (
-              <Link href="/seller/dashboard" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors">
+              <Link href="/seller/dashboard" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
                 {t('nav.myShop')}
               </Link>
             )}
             {user && (
               <>
-                <Link href="/shops" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors">
+                <Link href="/shops" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
                   {t('nav.shops')}
                 </Link>
-                <Link href="/map" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors">
+                <Link href="/map" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
                   {t('nav.map')}
                 </Link>
               </>
             )}
-            <Link href="/pricing" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors">
+            <Link href="/pricing" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
               {t('nav.pricing')}
             </Link>
           </nav>
 
-          {/* Right section */}
-          <div className="flex items-center gap-2">
+          {/* Right controls - always sized to their own content */}
+          <div className="flex items-center gap-2 shrink-0">
             <LanguageSwitcher />
             <ThemeToggle />
-            
+
             {user ? (
               <div className="hidden md:flex items-center gap-2">
                 <Link href="/notifications" className="p-2 rounded-lg hover:bg-surface-hover transition-colors relative">
@@ -91,10 +94,10 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-2">
-                <Link href="/login" className="px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-hover rounded-lg transition-colors">
+                <Link href="/login" className="px-4 py-2 text-sm font-medium text-foreground hover:bg-surface-hover rounded-lg transition-colors whitespace-nowrap">
                   {t('common.login')}
                 </Link>
-                <Link href="/register" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                <Link href="/register" className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors whitespace-nowrap">
                   {t('common.signUp')}
                 </Link>
               </div>

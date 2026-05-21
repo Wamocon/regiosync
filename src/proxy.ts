@@ -6,25 +6,34 @@ import { routing } from '@/i18n/routing';
 const intlMiddleware = createMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
-  // First handle i18n routing
+  // Handle i18n routing (locale redirect / locale detection)
   const intlResponse = intlMiddleware(request);
-  
-  // Then handle Supabase session
-  const supabaseResponse = await updateSession(request);
-  
-  // If supabase redirected, use that
-  if (supabaseResponse.headers.get('location')) {
-    return supabaseResponse;
-  }
 
-  // Copy supabase cookies to intl response
-  supabaseResponse.cookies.getAll().forEach((cookie) => {
-    intlResponse.cookies.set(cookie.name, cookie.value);
-  });
+  try {
+    // Handle Supabase session refresh + auth-guard redirects
+    const supabaseResponse = await updateSession(request);
+
+    // If Supabase issued a redirect (e.g. unauthenticated → /login), honour it
+    if (supabaseResponse.headers.get('location')) {
+      return supabaseResponse;
+    }
+
+    // Carry auth cookies onto the i18n response
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      intlResponse.cookies.set(cookie.name, cookie.value);
+    });
+  } catch (err) {
+    // Never let a Supabase error crash the entire request pipeline.
+    // The page will still render; auth state is re-checked in Server Components.
+    console.error('[proxy] Supabase session update failed:', err);
+  }
 
   return intlResponse;
 }
 
 export const config = {
-  matcher: ['/', '/(de|en)/:path*']
+  // Match every path except Next.js internals, static files, and the
+  // auth callback route which handles its own locale detection.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg|auth|api|.*\\..*).*)']
 };
+
