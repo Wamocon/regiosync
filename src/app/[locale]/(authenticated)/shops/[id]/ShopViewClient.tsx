@@ -5,7 +5,8 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Star, MapPin, Package, Send, Lock, HelpCircle, MessageSquare } from 'lucide-react';
+import { Star, MapPin, Package, Send, Lock, HelpCircle, MessageSquare, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 
 interface Product {
   id: string;
@@ -43,12 +44,19 @@ interface Shop {
   reviews: Review[];
 }
 
-export function ShopViewClient({ shop, userId, isPro }: { shop: Shop; userId: string; isPro: boolean }) {
+export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
+  shop: Shop;
+  userId: string;
+  isPro: boolean;
+  requestedTitles?: string[];
+}) {
   const t = useTranslations();
   const router = useRouter();
   const supabase = createClient();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
+  const [requestingProduct, setRequestingProduct] = useState<string | null>(null);
+  const [localRequestedTitles, setLocalRequestedTitles] = useState<string[]>(requestedTitles);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [requestTitle, setRequestTitle] = useState('');
@@ -83,6 +91,13 @@ export function ShopViewClient({ shop, userId, isPro }: { shop: Shop; userId: st
     router.refresh();
   };
 
+  const openProductRequest = (productName: string) => {
+    setRequestTitle(productName);
+    setRequestDesc('');
+    setRequestingProduct(productName);
+    setShowRequestForm(true);
+  };
+
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -92,7 +107,6 @@ export function ShopViewClient({ shop, userId, isPro }: { shop: Shop; userId: st
       title: requestTitle,
       description: requestDesc,
     });
-    // Notify the shop owner about the product request
     if (shop.owner_id && shop.owner_id !== userId) {
       await supabase.from('notifications').insert({
         user_id: shop.owner_id,
@@ -101,11 +115,12 @@ export function ShopViewClient({ shop, userId, isPro }: { shop: Shop; userId: st
         message: requestTitle,
       });
     }
+    setLocalRequestedTitles(prev => [...prev, requestTitle.toLowerCase()]);
     setRequestTitle('');
     setRequestDesc('');
+    setRequestingProduct(null);
     setShowRequestForm(false);
     setLoading(false);
-    router.refresh();
   };
 
   return (
@@ -159,14 +174,7 @@ export function ShopViewClient({ shop, userId, isPro }: { shop: Shop; userId: st
       {/* Products */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">{t('user.allProducts')} ({shop.products.filter(p => p.is_available).length})</h2>
-          <button
-            onClick={() => setShowRequestForm(true)}
-            className="flex items-center gap-2 px-4 py-2 border border-border rounded-xl hover:bg-surface-hover transition-all text-sm"
-          >
-            <Send className="w-4 h-4" />
-            {t('user.requestProduct')}
-          </button>
+          <h2 className="text-xl font-bold">{t('user.allProducts')} ({shop.products.length})</h2>
         </div>
 
         {shop.products.length === 0 ? (
@@ -176,55 +184,85 @@ export function ShopViewClient({ shop, userId, isPro }: { shop: Shop; userId: st
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {shop.products.filter(p => p.is_available).map((product) => (
-              <div key={product.id} className="glass-card p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold">{product.name}</h3>
-                    <p className="text-xs text-muted capitalize">{t(`seller.categories.${product.category}` as 'seller.categories.fruits')}</p>
-                  </div>
-                  {product.discount > 0 && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold bg-accent text-white rounded">-{product.discount}%</span>
+            {shop.products.map((product) => {
+              const isUnavailable = !product.is_available || product.quantity === 0;
+              const isRequested = localRequestedTitles.includes(product.name.toLowerCase());
+              return (
+                <div key={product.id} className={`glass-card overflow-hidden ${isUnavailable ? 'opacity-70' : ''}`}>
+                  {product.image_url && (
+                    <div className="relative w-full h-40">
+                      <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                      {isUnavailable && (
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                          <span className="bg-white/90 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">Unavailable</span>
+                        </div>
+                      )}
+                    </div>
                   )}
-                </div>
-                {product.description && (
-                  <p className="text-sm text-muted mt-2 line-clamp-2">{product.description}</p>
-                )}
-                <div className="mt-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-primary">
-                      {product.discount > 0
-                        ? (product.price * (1 - product.discount / 100)).toFixed(2)
-                        : product.price.toFixed(2)
-                      } EUR
-                    </span>
-                    {product.discount > 0 && (
-                      <span className="text-xs text-muted line-through">{product.price.toFixed(2)} EUR</span>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold truncate">{product.name}</h3>
+                        <p className="text-xs text-muted capitalize mt-0.5">{t(`seller.categories.${product.category}` as 'seller.categories.fruits')}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                        {product.discount > 0 && (
+                          <span className="px-1.5 py-0.5 text-[10px] font-bold bg-accent text-white rounded">-{product.discount}%</span>
+                        )}
+                        {!product.image_url && isUnavailable && (
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-full">Unavailable</span>
+                        )}
+                      </div>
+                    </div>
+                    {product.description && (
+                      <p className="text-sm text-muted mt-2 line-clamp-2">{product.description}</p>
                     )}
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-primary">
+                          {product.discount > 0
+                            ? (product.price * (1 - product.discount / 100)).toFixed(2)
+                            : product.price.toFixed(2)
+                          } EUR
+                        </span>
+                        {product.discount > 0 && (
+                          <span className="text-xs text-muted line-through">{product.price.toFixed(2)} EUR</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted">{product.quantity} {t('user.available')}</span>
+                    </div>
+                    {/* Per-product request button */}
+                    <div className="mt-3">
+                      {isRequested ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary/10 text-primary">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          {t('user.requested')}
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => openProductRequest(product.name)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-border hover:bg-surface-hover transition-colors"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          {t('user.requestProduct')}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <span className="text-xs text-muted">{product.quantity} available</span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Product Request Form */}
+      {/* Product Request Form (modal-style inline) */}
       {showRequestForm && (
         <div className="glass-card p-6 mb-6">
-          <h3 className="text-lg font-bold mb-4">{t('user.requestTitle')}</h3>
+          <h3 className="text-lg font-bold mb-4">
+            {t('user.requestTitle')}: <span className="text-primary">{requestingProduct}</span>
+          </h3>
           <form onSubmit={handleSubmitRequest} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('user.requestTitle')}</label>
-              <input
-                type="text"
-                value={requestTitle}
-                onChange={(e) => setRequestTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                required
-              />
-            </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('user.requestDesc')}</label>
               <textarea
@@ -232,13 +270,14 @@ export function ShopViewClient({ shop, userId, isPro }: { shop: Shop; userId: st
                 onChange={(e) => setRequestDesc(e.target.value)}
                 rows={3}
                 className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"
+                placeholder="Any additional details about your request..."
               />
             </div>
             <div className="flex gap-3">
               <button type="submit" disabled={loading} className="px-6 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark text-sm font-medium disabled:opacity-50">
                 {t('common.submit')}
               </button>
-              <button type="button" onClick={() => setShowRequestForm(false)} className="px-6 py-2.5 border border-border rounded-xl text-sm">
+              <button type="button" onClick={() => { setShowRequestForm(false); setRequestingProduct(null); }} className="px-6 py-2.5 border border-border rounded-xl text-sm">
                 {t('common.cancel')}
               </button>
             </div>

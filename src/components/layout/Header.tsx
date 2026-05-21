@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { Menu, X, Bell, User, LogOut, ShoppingBag } from 'lucide-react';
@@ -20,6 +20,22 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+  const pathname = usePathname();
+
+  // Returns nav link classes with active highlight when current route matches
+  const navLink = (href: string) =>
+    `px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+      pathname === href
+        ? 'bg-primary/10 text-primary font-semibold'
+        : 'text-foreground hover:bg-surface-hover'
+    }`;
+
+  const mobileNavLink = (href: string) =>
+    `px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+      pathname === href
+        ? 'bg-primary/10 text-primary font-semibold'
+        : 'hover:bg-surface-hover'
+    }`;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -50,30 +66,30 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
 
           {/* ── Desktop nav (centred) ─────────────────────────────── */}
           <nav className="hidden md:flex items-center justify-center gap-0.5">
-            <Link href="/" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
+            <Link href="/" className={navLink('/')}>
               {t('nav.home')}
             </Link>
             {user && userRole === 'super_admin' && (
-              <Link href="/admin" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
+              <Link href="/admin" className={navLink('/admin')}>
                 {t('nav.admin')}
               </Link>
             )}
             {user && userRole === 'seller' && (
-              <Link href="/seller/dashboard" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
+              <Link href="/seller/dashboard" className={navLink('/seller/dashboard')}>
                 {t('nav.myShop')}
               </Link>
             )}
             {user && (
               <>
-                <Link href="/shops" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
+                <Link href="/shops" className={navLink('/shops')}>
                   {t('nav.shops')}
                 </Link>
-                <Link href="/map" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
+                <Link href="/map" className={navLink('/map')}>
                   {t('nav.map')}
                 </Link>
               </>
             )}
-            <Link href="/pricing" className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors whitespace-nowrap">
+            <Link href="/pricing" className={navLink('/pricing')}>
               {t('nav.pricing')}
             </Link>
           </nav>
@@ -144,7 +160,7 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
             <nav className="flex flex-col gap-1">
               <Link
                 href="/"
-                className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-hover transition-colors"
+                className={mobileNavLink('/')}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t('nav.home')}
@@ -152,7 +168,7 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
               {user && userRole === 'super_admin' && (
                 <Link
                   href="/admin"
-                  className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-hover transition-colors"
+                  className={mobileNavLink('/admin')}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {t('nav.admin')}
@@ -161,7 +177,7 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
               {user && userRole === 'seller' && (
                 <Link
                   href="/seller/dashboard"
-                  className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-hover transition-colors"
+                  className={mobileNavLink('/seller/dashboard')}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {t('nav.myShop')}
@@ -171,14 +187,14 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
                 <>
                   <Link
                     href="/shops"
-                    className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-hover transition-colors"
+                    className={mobileNavLink('/shops')}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t('nav.shops')}
                   </Link>
                   <Link
                     href="/map"
-                    className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-hover transition-colors"
+                    className={mobileNavLink('/map')}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t('nav.map')}
@@ -187,7 +203,7 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
               )}
               <Link
                 href="/pricing"
-                className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-hover transition-colors"
+                className={mobileNavLink('/pricing')}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t('nav.pricing')}

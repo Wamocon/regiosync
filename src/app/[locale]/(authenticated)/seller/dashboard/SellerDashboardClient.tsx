@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Store, Package, Star, MessageSquare, Plus, MapPin, HelpCircle, Trash2, Edit } from 'lucide-react';
+import { Store, Package, Star, MessageSquare, Plus, MapPin, HelpCircle, Trash2, Edit, X, Save } from 'lucide-react';
 
 interface Shop {
   id: string;
@@ -36,6 +36,7 @@ interface ProductRequest {
   description: string;
   status: string;
   created_at: string;
+  shop_id: string;
   user: { full_name: string } | null;
 }
 
@@ -65,6 +66,12 @@ export function SellerDashboardClient({
   const t = useTranslations();
   const router = useRouter();
   const [showHelp, setShowHelp] = useState(false);
+  const [editingShop, setEditingShop] = useState<Shop | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [editAddress, setEditAddress] = useState('');
+  const [editCity, setEditCity] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
   const supabase = createClient();
 
   const totalProducts = shops.reduce((sum, s) => sum + s.products.length, 0);
@@ -83,12 +90,84 @@ export function SellerDashboardClient({
     router.refresh();
   };
 
+  const openEditShop = (shop: Shop) => {
+    setEditingShop(shop);
+    setEditName(shop.name);
+    setEditDesc(shop.description);
+    setEditAddress(shop.address);
+    setEditCity(shop.city);
+  };
+
+  const handleSaveShop = async () => {
+    if (!editingShop) return;
+    setEditLoading(true);
+    await supabase.from('shops').update({
+      name: editName,
+      description: editDesc,
+      address: editAddress,
+      city: editCity,
+    }).eq('id', editingShop.id);
+    setEditLoading(false);
+    setEditingShop(null);
+    router.refresh();
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      {/* Edit Shop Modal */}
+      {editingShop && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="bg-background border border-border rounded-2xl p-6 w-full max-w-lg shadow-xl">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold">{t('seller.editShop')}</h2>
+              <button onClick={() => setEditingShop(null)} className="p-1.5 rounded-lg hover:bg-surface-hover">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('seller.shopName')}</label>
+                <input value={editName} onChange={e => setEditName(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('seller.shopDescription')}</label>
+                <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={2}
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Address</label>
+                  <input value={editAddress} onChange={e => setEditAddress(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">City</label>
+                  <input value={editCity} onChange={e => setEditCity(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button onClick={handleSaveShop} disabled={editLoading}
+                className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition-all text-sm font-medium disabled:opacity-50">
+                <Save className="w-4 h-4" />
+                {editLoading ? t('common.loading') : t('common.save')}
+              </button>
+              <button onClick={() => setEditingShop(null)}
+                className="px-5 py-2.5 border border-border rounded-xl hover:bg-surface-hover transition-all text-sm">
+                {t('common.cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">{t('seller.dashboard')}</h1>
+          <h1 className="text-3xl font-bold">{t('nav.dashboard')}</h1>
           <p className="text-muted mt-1">
             {profile.full_name} {profile.is_pro && <span className="px-1.5 py-0.5 text-[10px] font-bold bg-accent text-white rounded ml-1">PRO</span>}
           </p>
@@ -112,10 +191,18 @@ export function SellerDashboardClient({
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={<Store className="w-5 h-5" />} label={t('seller.totalShops')} value={shops.length.toString()} />
-        <StatCard icon={<Package className="w-5 h-5" />} label={t('seller.totalProducts')} value={totalProducts.toString()} />
-        <StatCard icon={<Star className="w-5 h-5" />} label={t('seller.averageRating')} value={avgRating} />
-        <StatCard icon={<MessageSquare className="w-5 h-5" />} label={t('seller.totalReviews')} value={reviews.length.toString()} />
+        <Link href="/seller/shops/new">
+          <StatCard icon={<Store className="w-5 h-5" />} label={t('seller.totalShops')} value={shops.length.toString()} clickable />
+        </Link>
+        <Link href={shops[0] ? `/seller/shops/${shops[0].id}` : '/seller/shops/new'}>
+          <StatCard icon={<Package className="w-5 h-5" />} label={t('seller.totalProducts')} value={totalProducts.toString()} clickable />
+        </Link>
+        <div>
+          <StatCard icon={<Star className="w-5 h-5" />} label={t('seller.averageRating')} value={avgRating} />
+        </div>
+        <div>
+          <StatCard icon={<MessageSquare className="w-5 h-5" />} label={t('seller.totalReviews')} value={reviews.length.toString()} />
+        </div>
       </div>
 
       {/* Shops */}
@@ -143,9 +230,9 @@ export function SellerDashboardClient({
                     </p>
                   </div>
                   <div className="flex gap-1">
-                    <Link href={`/seller/shops/${shop.id}`} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted">
+                    <button onClick={() => openEditShop(shop)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-primary">
                       <Edit className="w-4 h-4" />
-                    </Link>
+                    </button>
                     <button onClick={() => handleDeleteShop(shop.id)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-red-500">
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -163,7 +250,7 @@ export function SellerDashboardClient({
         )}
       </div>
 
-      {/* Recent Requests */}
+      {/* Requests grouped by shop */}
       <div>
         <h2 className="text-xl font-bold mb-4">{t('seller.recentOrders')}</h2>
         {requests.length === 0 ? (
@@ -171,51 +258,64 @@ export function SellerDashboardClient({
             {t('common.noResults')}
           </div>
         ) : (
-          <div className="space-y-3">
-            {requests.map((req) => (
-              <div key={req.id} className="glass-card p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-sm">{req.title}</p>
-                  <p className="text-xs text-muted">
-                    {req.user?.full_name} - <span suppressHydrationWarning>{new Date(req.created_at).toLocaleDateString()}</span>
-                  </p>
+          shops.map((shop) => {
+            const shopRequests = requests.filter(r => r.shop_id === shop.id);
+            if (shopRequests.length === 0) return null;
+            return (
+              <div key={shop.id} className="mb-6">
+                <h3 className="text-sm font-semibold text-muted mb-2 flex items-center gap-1.5">
+                  <Store className="w-4 h-4" />{shop.name}
+                </h3>
+                <div className="space-y-3">
+                  {shopRequests.map((req) => (
+                    <div key={req.id} className="glass-card p-4 flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{req.title}</p>
+                        <p className="text-xs text-muted">
+                          {req.user?.full_name} &middot; <span suppressHydrationWarning>{new Date(req.created_at).toLocaleDateString()}</span>
+                        </p>
+                      </div>
+                      {req.status === 'pending' ? (
+                        <div className="flex gap-2 shrink-0">
+                          <button
+                            onClick={() => handleRequestAction(req.id, 'accepted')}
+                            className="px-3 py-1 text-xs bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                          >
+                            {t('seller.accept')}
+                          </button>
+                          <button
+                            onClick={() => handleRequestAction(req.id, 'rejected')}
+                            className="px-3 py-1 text-xs border border-border rounded-lg hover:bg-surface-hover transition-colors"
+                          >
+                            {t('seller.reject')}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className={`px-2 py-1 rounded-full text-xs shrink-0 ${
+                          req.status === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                        }`}>
+                          {req.status === 'accepted' ? t('seller.accepted') : t('seller.rejected')}
+                        </span>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                {req.status === 'pending' ? (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleRequestAction(req.id, 'accepted')}
-                      className="px-3 py-1 text-xs bg-primary text-white rounded-lg"
-                    >
-                      {t('seller.accept')}
-                    </button>
-                    <button
-                      onClick={() => handleRequestAction(req.id, 'rejected')}
-                      className="px-3 py-1 text-xs border border-border rounded-lg"
-                    >
-                      {t('seller.reject')}
-                    </button>
-                  </div>
-                ) : (
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    req.status === 'accepted' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                  }`}>
-                    {req.status === 'accepted' ? t('seller.accepted') : t('seller.rejected')}
-                  </span>
-                )}
               </div>
-            ))}
-          </div>
+            );
+          })
         )}
       </div>
     </div>
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function StatCard({ icon, label, value, clickable }: { icon: React.ReactNode; label: string; value: string; clickable?: boolean }) {
   return (
-    <div className="glass-card p-4">
+    <div className={`glass-card p-4 h-full transition-all ${
+      clickable ? 'hover:border-primary/50 hover:shadow-md cursor-pointer' : ''
+    }`}>
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-primary/10 text-primary">{icon}</div>
+        <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">{icon}</div>
         <div>
           <p className="text-2xl font-bold">{value}</p>
           <p className="text-xs text-muted">{label}</p>

@@ -3,13 +3,21 @@ import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { MapPin, ShoppingBag, Leaf, Map, ArrowRight, Star } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
 
-export default function HomePage() {
+export default async function HomePage() {
   const t = useTranslations();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let profile = null;
+  if (user) {
+    const { data } = await supabase.from('profiles').select('role,is_pro').eq('id', user.id).single();
+    profile = data;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header user={user} userRole={profile?.role} isPro={profile?.is_pro} />
       
       <main className="flex-1">
         {/* Hero Section */}

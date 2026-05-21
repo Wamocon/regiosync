@@ -28,5 +28,21 @@ export default async function ShopViewPage({ params }: { params: Promise<{ local
 
   if (!shop) notFound();
 
-  return <ShopViewClient shop={shop} userId={user.id} isPro={profile?.is_pro ?? false} />;
+  // Fetch this user's existing requests for this shop (to show "Requested" labels)
+  const { data: existingRequests } = await supabase
+    .from('product_requests')
+    .select('title')
+    .eq('shop_id', id)
+    .eq('user_id', user.id);
+
+  const requestedTitles = (existingRequests ?? []).map((r: { title: string }) => r.title.toLowerCase());
+
+  return (
+    <ShopViewClient
+      shop={shop}
+      userId={user.id}
+      isPro={profile?.is_pro ?? false}
+      requestedTitles={requestedTitles}
+    />
+  );
 }

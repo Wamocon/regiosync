@@ -1,10 +1,28 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { MapPin, Navigation, Store, HelpCircle } from 'lucide-react';
+import { MapPin, Navigation, Store, HelpCircle, Search } from 'lucide-react';
+
+interface NominatimResult {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+  address: {
+    house_number?: string;
+    road?: string;
+    city?: string;
+    town?: string;
+    village?: string;
+    municipality?: string;
+    state?: string;
+    country?: string;
+    postcode?: string;
+  };
+}
 
 export default function NewShopPage() {
   const t = useTranslations();
@@ -18,6 +36,48 @@ export default function NewShopPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [gpsLoading, setGpsLoading] = useState(false);
+
+  // Address autocomplete state
+  const [addressSuggestions, setAddressSuggestions] = useState<NominatimResult[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [addressSearching, setAddressSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searchAddress = useCallback(async (query: string) => {
+    if (query.length < 3) { setAddressSuggestions([]); setShowSuggestions(false); return; }
+    setAddressSearching(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`,
+        { headers: { 'Accept-Language': 'de,en' } }
+      );
+      const data: NominatimResult[] = await res.json();
+      setAddressSuggestions(data);
+      setShowSuggestions(data.length > 0);
+    } catch {
+      setAddressSuggestions([]);
+    } finally {
+      setAddressSearching(false);
+    }
+  }, []);
+
+  const handleAddressChange = (value: string) => {
+    setAddress(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => searchAddress(value), 400);
+  };
+
+  const selectSuggestion = (result: NominatimResult) => {
+    const addr = result.address;
+    const streetParts = [addr.house_number, addr.road].filter(Boolean).join(' ');
+    setAddress(streetParts || result.display_name.split(',')[0]);
+    const cityValue = addr.city || addr.town || addr.village || addr.municipality || '';
+    setCity(cityValue);
+    setLatitude(result.lat);
+    setLongitude(result.lon);
+    setShowSuggestions(false);
+    setAddressSuggestions([]);
+  };
 
   const handleUseGPS = () => {
     if (!navigator.geolocation) {
@@ -110,14 +170,38 @@ export default function NewShopPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
+            <div className="relative">
               <label className="block text-sm font-medium mb-1.5">Address</label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-              />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+                {addressSearching && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                )}
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => handleAddressChange(e.target.value)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  onFocus={() => addressSuggestions.length > 0 && setShowSuggestions(true)}
+                  placeholder="Start typing an address..."
+                  className="w-full pl-9 pr-4 py-3 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  autoComplete="off"
+                />
+              </div>
+              {showSuggestions && addressSuggestions.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-xl shadow-lg overflow-hidden">
+                  {addressSuggestions.map((result) => (
+                    <button
+                      key={result.place_id}
+                      type="button"
+                      onClick={() => selectSuggestion(result)}
+                      className="w-full px-4 py-2.5 text-left text-sm hover:bg-surface-hover transition-colors border-b border-border/50 last:border-0 truncate"
+                    >
+                      {result.display_name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1.5">City</label>

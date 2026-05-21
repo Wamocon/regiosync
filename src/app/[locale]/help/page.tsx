@@ -1,16 +1,24 @@
-'use client';
+'use server';
 
 import { useTranslations } from 'next-intl';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HelpCircle, Book, Mail, MessageCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
 
-export default function HelpPage() {
+export default async function HelpPage() {
   const t = useTranslations();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let profile = null;
+  if (user) {
+    const { data } = await supabase.from('profiles').select('role,is_pro').eq('id', user.id).single();
+    profile = data;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header user={user} userRole={profile?.role} isPro={profile?.is_pro} />
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="text-3xl font-bold mb-8">{t('help.title')}</h1>
 

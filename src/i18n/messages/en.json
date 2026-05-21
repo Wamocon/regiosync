@@ -181,6 +181,8 @@
     "requestTitle": "Product Request",
     "requestDesc": "Describe the product you are looking for",
     "requestSent": "Request sent to the seller!",
+    "requested": "Requested",
+    "available": "available",
     "shopDetails": "Shop Details",
     "allProducts": "All Products",
     "openNow": "Open Now",
