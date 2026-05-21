@@ -5,7 +5,7 @@ import { routing } from '@/i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Handle i18n locale routing (redirect / to /en, etc.)
   const intlResponse = intlMiddleware(request);
 
@@ -13,19 +13,19 @@ export async function middleware(request: NextRequest) {
     // Refresh Supabase session + enforce auth-guard redirects
     const supabaseResponse = await updateSession(request);
 
-    // If Supabase issued a redirect (unauthenticated → /login), honour it
+    // If Supabase issued a redirect (unauthenticated -> /login), honour it
     if (supabaseResponse.headers.get('location')) {
       return supabaseResponse;
     }
 
     // Carry auth cookies onto the i18n response
-    supabaseResponse.cookies.getAll().forEach((cookie) => {
+    supabaseResponse.cookies.getAll().forEach((cookie: { name: string; value: string }) => {
       intlResponse.cookies.set(cookie.name, cookie.value);
     });
   } catch (err) {
     // Never let a Supabase error crash the entire request pipeline.
     // Pages still render; auth state is re-checked in Server Components.
-    console.error('[middleware] Supabase session update failed:', err);
+    console.error('[proxy] Supabase session update failed:', err);
   }
 
   return intlResponse;
