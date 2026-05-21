@@ -1,27 +1,21 @@
 'use client';
 
-import 'leaflet/dist/leaflet.css';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useSyncExternalStore } from 'react';
-import { Lock, MapPin, HelpCircle } from 'lucide-react';
+import { Lock, HelpCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false }
-);
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-);
-const Popup = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Popup),
-  { ssr: false }
+const LeafletMap = dynamic(
+  () => import('./LeafletMap').then((mod) => mod.LeafletMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-muted text-sm">Loading map...</p>
+      </div>
+    ),
+  }
 );
 
 interface Shop {
@@ -41,10 +35,6 @@ export function MapClient({ shops, isPro }: { shops: Shop[]; isPro: boolean }) {
     () => false
   );
 
-  // Center of Germany
-  const defaultCenter: [number, number] = [51.1657, 10.4515];
-  const defaultZoom = isPro ? 6 : 5;
-
   if (!mounted) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -62,10 +52,8 @@ export function MapClient({ shops, isPro }: { shops: Shop[]; isPro: boolean }) {
           <h1 className="text-3xl font-bold">{t('map.title')}</h1>
           <p className="text-muted mt-1">{shops.length} {t('nav.shops')}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.map')}>
-            <HelpCircle className="w-5 h-5 text-muted" />
-          </div>
+        <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.map')}>
+          <HelpCircle className="w-5 h-5 text-muted" />
         </div>
       </div>
 
@@ -82,44 +70,7 @@ export function MapClient({ shops, isPro }: { shops: Shop[]; isPro: boolean }) {
       )}
 
       <div className="glass-card overflow-hidden" style={{ height: '600px' }}>
-        <MapContainer
-          center={defaultCenter}
-          zoom={defaultZoom}
-          style={{ height: '100%', width: '100%' }}
-          scrollWheelZoom={isPro}
-          zoomControl={isPro}
-          dragging={isPro}
-          doubleClickZoom={isPro}
-          touchZoom={isPro}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {shops.map((shop) => (
-            <Marker key={shop.id} position={[shop.latitude, shop.longitude]}>
-              <Popup>
-                <div className="p-1">
-                  <h3 className="font-semibold text-sm">{shop.name}</h3>
-                  <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                    <MapPin className="w-3 h-3" />
-                    {shop.city || shop.address}
-                  </p>
-                  {isPro && (
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${shop.latitude},${shop.longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline mt-1 block"
-                    >
-                      Get Directions
-                    </a>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        <LeafletMap shops={shops} isPro={isPro} t={t} />
       </div>
     </div>
   );
