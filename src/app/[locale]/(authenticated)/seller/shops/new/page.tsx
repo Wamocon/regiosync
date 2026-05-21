@@ -132,7 +132,7 @@ export default function NewShopPage() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">{t('seller.createShop')}</h1>
-        <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.tooltip')}>
+        <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.newShop')}>
           <HelpCircle className="w-5 h-5 text-muted" />
         </div>
       </div>

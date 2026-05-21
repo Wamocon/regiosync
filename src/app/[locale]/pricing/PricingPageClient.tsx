@@ -16,7 +16,6 @@ interface PricingPageClientProps {
 export function PricingPageClient({ user, userRole, isPro }: PricingPageClientProps) {
   const t = useTranslations();
   const [yearly, setYearly] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -26,28 +25,25 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">{t('pricing.title')}</h1>
             <p className="text-muted text-lg">{t('pricing.subtitle')}</p>
-            <button onClick={() => setShowHelp(!showHelp)} className="mt-2 p-2 rounded-lg hover:bg-surface-hover inline-flex">
+            <div className="mt-2 p-2 rounded-lg hover:bg-surface-hover inline-flex cursor-help" title={t('help.pages.pricing')}>
               <HelpCircle className="w-5 h-5 text-muted" />
-            </button>
-          </div>
-
-          {showHelp && (
-            <div className="mb-8 p-4 glass-card bg-primary/5 text-center">
-              <p className="text-sm text-muted">{t('help.tooltip')}</p>
             </div>
-          )}
+          </div>
 
           {/* Toggle */}
           <div className="flex items-center justify-center gap-4 mb-12">
             <span className={`text-sm font-medium ${!yearly ? 'text-foreground' : 'text-muted'}`}>{t('pricing.monthly')}</span>
             <button
+              type="button"
+              role="switch"
+              aria-checked={yearly}
               onClick={() => setYearly(!yearly)}
-              className={`relative w-14 h-7 rounded-full transition-colors ${yearly ? 'bg-primary' : 'bg-border'}`}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 ${yearly ? 'bg-primary' : 'bg-border'}`}
             >
-              <span className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-transform ${yearly ? 'left-8' : 'left-1'}`} />
+              <span className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${yearly ? 'translate-x-7' : 'translate-x-0'}`} />
             </button>
             <span className={`text-sm font-medium ${yearly ? 'text-foreground' : 'text-muted'}`}>
-              {t('pricing.yearly')} <span className="text-primary text-xs">({t('pricing.savePercent')})</span>
+              {t('pricing.yearly')} <span className="text-primary text-xs font-semibold">({t('pricing.savePercent')})</span>
             </span>
           </div>
 

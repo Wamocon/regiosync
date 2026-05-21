@@ -29,8 +29,6 @@ export function AdminDashboardClient({ users, reports }: { users: Profile[]; rep
   const t = useTranslations();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'users' | 'reports'>('users');
-  const [showHelp, setShowHelp] = useState(false);
-
   const supabase = createClient();
 
   const totalSellers = users.filter(u => u.role === 'seller').length;
@@ -75,16 +73,10 @@ export function AdminDashboardClient({ users, reports }: { users: Profile[]; rep
           <h1 className="text-3xl font-bold">{t('admin.title')}</h1>
           <p className="text-muted mt-1">{t('admin.userManagement')}</p>
         </div>
-        <button onClick={() => setShowHelp(!showHelp)} className="p-2 rounded-lg hover:bg-surface-hover">
+        <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.admin')}>
           <HelpCircle className="w-5 h-5 text-muted" />
-        </button>
-      </div>
-
-      {showHelp && (
-        <div className="mb-6 p-4 glass-card bg-primary/5">
-          <p className="text-sm text-muted">{t('help.tooltip')}</p>
         </div>
-      )}
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

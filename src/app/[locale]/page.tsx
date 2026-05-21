@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -6,7 +6,7 @@ import { MapPin, ShoppingBag, Leaf, Map, ArrowRight, Star } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function HomePage() {
-  const t = useTranslations();
+  const t = await getTranslations();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   let profile = null;

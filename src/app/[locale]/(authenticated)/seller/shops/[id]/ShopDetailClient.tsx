@@ -137,7 +137,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
           <p className="text-muted mt-1">{shop.description}</p>
         </div>
         <div className="flex gap-2">
-          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.tooltip')}>
+          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.shopManage')}>
             <HelpCircle className="w-5 h-5 text-muted" />
           </div>
           <button onClick={openAddForm}

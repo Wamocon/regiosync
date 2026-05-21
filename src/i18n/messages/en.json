@@ -115,6 +115,7 @@
     "editProfile": "Edit Profile",
     "avatar": "Avatar",
     "changeAvatar": "Change Avatar",
+    "uploadAvatar": "Upload Profile Picture",
     "personalInfo": "Personal Information",
     "accountSettings": "Account Settings",
     "subscription": "Subscription",
@@ -286,6 +287,19 @@
     "faq": "FAQ",
     "contactUs": "Contact Us",
     "documentation": "Documentation",
-    "tooltip": "Need help? Click here."
+    "tooltip": "Need help? Click here.",
+    "pages": {
+      "home": "Welcome to RegioSync! Browse local shops, view products on the map, and connect directly with regional producers. Use the navigation above to explore shops, view the map, or log in to your account.",
+      "shops": "Browse all registered local shops. Use the search bar to filter by name or location. Click on a shop card to view its products, reviews, and contact details. Free users can view up to 5 shops.",
+      "shopDetail": "View all products from this shop. You can request a specific product by clicking the Request Product button. Write a review to share your experience. Pro users can get directions directly to this shop.",
+      "map": "See all regional shops on an interactive map. Click on a marker to see the shop name and a link to its detail page. Pro users get full zoom control, directions, and their current location.",
+      "pricing": "Compare the Free and Pro plans. Toggle between monthly and yearly billing. The yearly plan saves 20%. Your current plan is shown in your profile. Contact us to upgrade.",
+      "profile": "Manage your personal information. Click Edit Profile to update your name or upload a profile picture. Your subscription plan is shown below. Upgrade to Pro for unlimited shop access and map features.",
+      "dashboard": "Your seller overview. See total shops, products, and incoming requests. Click on a stat box to navigate there. Edit your shop details using the edit button on each shop card. Requests from buyers are grouped by shop.",
+      "shopManage": "Manage products in this shop. Click Add Product to create a new listing with name, category, price, quantity, image, and discount. Click the edit icon on any product to update it. Setting quantity to 0 marks the product as Unavailable.",
+      "newShop": "Create a new shop listing. Enter your shop name, description, and address. Use the address search to auto-fill the city and coordinates. You can also use GPS to detect your location automatically.",
+      "notifications": "View all notifications from buyer requests and reviews. Click on a notification to navigate to the relevant page.",
+      "admin": "Admin panel for managing users, shops, and reports. Assign or change user roles, ban/unban users, and view platform statistics."
+    }
   }
 }

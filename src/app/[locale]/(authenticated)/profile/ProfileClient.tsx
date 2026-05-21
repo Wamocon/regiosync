@@ -1,10 +1,11 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, Link } from '@/i18n/navigation';
-import { User, Mail, Shield, Crown, Calendar, HelpCircle } from 'lucide-react';
+import { User, Mail, Shield, Crown, Calendar, HelpCircle, Camera } from 'lucide-react';
+import Image from 'next/image';
 
 interface Profile {
   id: string;
@@ -24,8 +25,10 @@ export function ProfileClient({ profile }: { profile: Profile }) {
   const supabase = createClient();
   const [editing, setEditing] = useState(false);
   const [fullName, setFullName] = useState(profile.full_name);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url);
   const [loading, setLoading] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = async () => {
     setLoading(true);
@@ -35,28 +38,60 @@ export function ProfileClient({ profile }: { profile: Profile }) {
     router.refresh();
   };
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarLoading(true);
+    const ext = file.name.split('.').pop();
+    const path = `avatars/${profile.id}.${ext}`;
+    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+    if (!error) {
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+      const url = `${data.publicUrl}?t=${Date.now()}`;
+      await supabase.from('profiles').update({ avatar_url: url }).eq('id', profile.id);
+      setAvatarUrl(url);
+    }
+    setAvatarLoading(false);
+  };
+
   const roleLabel = profile.role === 'super_admin' ? t('admin.roleSuperAdmin') : profile.role === 'seller' ? t('admin.roleSeller') : t('admin.roleUser');
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
-        <button onClick={() => setShowHelp(!showHelp)} className="p-2 rounded-lg hover:bg-surface-hover">
+        <div
+          className="p-2 rounded-lg hover:bg-surface-hover cursor-help"
+          title={t('help.pages.profile')}
+        >
           <HelpCircle className="w-5 h-5 text-muted" />
-        </button>
-      </div>
-
-      {showHelp && (
-        <div className="mb-6 p-4 glass-card bg-primary/5">
-          <p className="text-sm text-muted">{t('help.tooltip')}</p>
         </div>
-      )}
+      </div>
 
       <div className="glass-card p-6">
         {/* Avatar */}
         <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="w-8 h-8 text-primary" />
+          <div className="relative shrink-0">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+              {avatarUrl ? (
+                <Image src={avatarUrl} alt={profile.full_name} width={80} height={80} className="object-cover w-full h-full" unoptimized />
+              ) : (
+                <User className="w-10 h-10 text-primary" />
+              )}
+            </div>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={avatarLoading}
+              className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-dark transition-colors shadow-md"
+              title={t('profile.uploadAvatar')}
+            >
+              {avatarLoading ? (
+                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Camera className="w-3.5 h-3.5" />
+              )}
+            </button>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
           </div>
           <div>
             <h2 className="text-xl font-bold">{profile.full_name}</h2>
@@ -68,6 +103,7 @@ export function ProfileClient({ profile }: { profile: Profile }) {
                 </span>
               )}
             </div>
+            <p className="text-xs text-muted mt-1">{t('profile.uploadAvatar')}</p>
           </div>
         </div>
 
@@ -76,7 +112,7 @@ export function ProfileClient({ profile }: { profile: Profile }) {
           <h3 className="font-semibold text-sm text-muted">{t('profile.personalInfo')}</h3>
           
           <div className="flex items-center gap-3 p-3 rounded-xl bg-surface">
-            <User className="w-5 h-5 text-muted" />
+            <User className="w-5 h-5 text-muted shrink-0" />
             {editing ? (
               <input
                 type="text"
@@ -90,17 +126,17 @@ export function ProfileClient({ profile }: { profile: Profile }) {
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-xl bg-surface">
-            <Mail className="w-5 h-5 text-muted" />
+            <Mail className="w-5 h-5 text-muted shrink-0" />
             <span>{profile.email}</span>
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-xl bg-surface">
-            <Shield className="w-5 h-5 text-muted" />
+            <Shield className="w-5 h-5 text-muted shrink-0" />
             <span>{roleLabel}</span>
           </div>
 
           <div className="flex items-center gap-3 p-3 rounded-xl bg-surface">
-            <Calendar className="w-5 h-5 text-muted" />
+            <Calendar className="w-5 h-5 text-muted shrink-0" />
             <span suppressHydrationWarning>{t('profile.memberSince')}: {new Date(profile.created_at).toLocaleDateString()}</span>
           </div>
         </div>

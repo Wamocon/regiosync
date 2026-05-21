@@ -145,7 +145,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
             </div>
           </div>
           <div className="flex gap-2">
-            <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.tooltip')}>
+            <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.shopDetail')}>
               <HelpCircle className="w-5 h-5 text-muted" />
             </div>
             {isPro ? (

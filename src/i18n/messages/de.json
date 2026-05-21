@@ -115,6 +115,7 @@
     "editProfile": "Profil bearbeiten",
     "avatar": "Profilbild",
     "changeAvatar": "Profilbild aendern",
+    "uploadAvatar": "Profilbild hochladen",
     "personalInfo": "Persoenliche Informationen",
     "accountSettings": "Kontoeinstellungen",
     "subscription": "Abonnement",
@@ -284,6 +285,19 @@
     "faq": "FAQ",
     "contactUs": "Kontaktiere uns",
     "documentation": "Dokumentation",
-    "tooltip": "Brauchst du Hilfe? Klicke hier."
+    "tooltip": "Brauchst du Hilfe? Klicke hier.",
+    "pages": {
+      "home": "Willkommen bei RegioSync! Entdecke lokale Laeden, sieh Produkte auf der Karte und verbinde dich direkt mit regionalen Produzenten. Nutze die Navigation oben, um Laeden zu erkunden, die Karte anzusehen oder dich in dein Konto einzuloggen.",
+      "shops": "Durchsuche alle registrierten lokalen Laeden. Nutze die Suchleiste, um nach Name oder Ort zu filtern. Klicke auf eine Ladenkarte, um Produkte, Bewertungen und Kontaktdetails zu sehen. Kostenlose Nutzer koennen bis zu 5 Laeden ansehen.",
+      "shopDetail": "Sieh alle Produkte dieses Ladens. Klicke auf Produkt anfragen, um eine Anfrage zu stellen. Schreibe eine Bewertung, um deine Erfahrung zu teilen. Pro-Nutzer erhalten eine Wegbeschreibung direkt zum Laden.",
+      "map": "Sieh alle regionalen Laeden auf einer interaktiven Karte. Klicke auf eine Markierung, um den Ladennamen und einen Link zur Detailseite zu sehen. Pro-Nutzer erhalten vollen Zoom, Wegbeschreibungen und ihren aktuellen Standort.",
+      "pricing": "Vergleiche den Kostenlos- und Pro-Plan. Wechsle zwischen monatlicher und jaehrlicher Abrechnung. Der Jahresplan spart 20%. Dein aktueller Plan wird in deinem Profil angezeigt.",
+      "profile": "Verwalte deine persoenlichen Daten. Klicke auf Profil bearbeiten, um deinen Namen zu aendern oder ein Profilbild hochzuladen. Dein Abonnementplan wird unten angezeigt. Upgrade auf Pro fuer unbegrenzten Zugang.",
+      "dashboard": "Deine Verkaeufer-Uebersicht. Sieh Gesamtanzahl von Laeden, Produkten und eingehenden Anfragen. Klicke auf eine Statistikbox, um dorthin zu navigieren. Anfragen von Kaeufer sind nach Laden gruppiert.",
+      "shopManage": "Verwalte Produkte in diesem Laden. Klicke auf Produkt hinzufuegen. Klicke auf das Bearbeiten-Symbol eines Produkts, um es zu aktualisieren. Bei Menge 0 wird das Produkt als Nicht verfuegbar markiert.",
+      "newShop": "Erstelle eine neue Ladenliste. Gib Name, Beschreibung und Adresse ein. Nutze die Adresssuche, um Stadt und Koordinaten automatisch auszufuellen. Du kannst auch GPS verwenden.",
+      "notifications": "Sieh alle Benachrichtigungen zu Kaeuferanfragen und Bewertungen.",
+      "admin": "Admin-Bereich zur Verwaltung von Benutzern, Laeden und Meldungen. Weise Rollen zu, sperre/entsperre Benutzer und sieh Plattformstatistiken."
+    }
   }
 }

@@ -65,7 +65,6 @@ export function SellerDashboardClient({
 }) {
   const t = useTranslations();
   const router = useRouter();
-  const [showHelp, setShowHelp] = useState(false);
   const [editingShop, setEditingShop] = useState<Shop | null>(null);
   const [editName, setEditName] = useState('');
   const [editDesc, setEditDesc] = useState('');
@@ -173,21 +172,15 @@ export function SellerDashboardClient({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowHelp(!showHelp)} className="p-2 rounded-lg hover:bg-surface-hover">
+          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.dashboard')}>
             <HelpCircle className="w-5 h-5 text-muted" />
-          </button>
+          </div>
           <Link href="/seller/shops/new" className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-all text-sm font-medium">
             <Plus className="w-4 h-4" />
             {t('seller.createShop')}
           </Link>
         </div>
       </div>
-
-      {showHelp && (
-        <div className="mb-6 p-4 glass-card bg-primary/5">
-          <p className="text-sm text-muted">{t('help.tooltip')}</p>
-        </div>
-      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

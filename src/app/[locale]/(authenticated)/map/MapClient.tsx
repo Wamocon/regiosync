@@ -63,7 +63,7 @@ export function MapClient({ shops, isPro }: { shops: Shop[]; isPro: boolean }) {
           <p className="text-muted mt-1">{shops.length} {t('nav.shops')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.tooltip')}>
+          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.map')}>
             <HelpCircle className="w-5 h-5 text-muted" />
           </div>
         </div>
