@@ -5,15 +5,15 @@ import { routing } from '@/i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-export async function proxy(request: NextRequest) {
-  // Handle i18n routing (locale redirect / locale detection)
+export async function middleware(request: NextRequest) {
+  // Handle i18n locale routing (redirect / to /en, etc.)
   const intlResponse = intlMiddleware(request);
 
   try {
-    // Handle Supabase session refresh + auth-guard redirects
+    // Refresh Supabase session + enforce auth-guard redirects
     const supabaseResponse = await updateSession(request);
 
-    // If Supabase issued a redirect (e.g. unauthenticated → /login), honour it
+    // If Supabase issued a redirect (unauthenticated → /login), honour it
     if (supabaseResponse.headers.get('location')) {
       return supabaseResponse;
     }
@@ -24,16 +24,15 @@ export async function proxy(request: NextRequest) {
     });
   } catch (err) {
     // Never let a Supabase error crash the entire request pipeline.
-    // The page will still render; auth state is re-checked in Server Components.
-    console.error('[proxy] Supabase session update failed:', err);
+    // Pages still render; auth state is re-checked in Server Components.
+    console.error('[middleware] Supabase session update failed:', err);
   }
 
   return intlResponse;
 }
 
 export const config = {
-  // Match every path except Next.js internals, static files, and the
-  // auth callback route which handles its own locale detection.
+  // Match every path except Next.js internals, static assets, and the
+  // Supabase auth-callback route which handles its own locale detection.
   matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg|auth|api|.*\\..*).*)']
 };
-
