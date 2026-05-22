@@ -177,6 +177,11 @@
     "productAdded": "Product added successfully!",
     "noShops": "You haven't created any shops yet.",
     "noProducts": "No products in this shop yet.",
+    "dietaryType": "Dietary Type",
+    "dietaryNone": "No restriction",
+    "dietaryVegan": "Vegan",
+    "dietaryVegetarian": "Vegetarian",
+    "dietaryFlexitarian": "Flexitarian",
     "categories": {
       "fruits": "Fruits",
       "vegetables": "Vegetables",
@@ -222,7 +227,11 @@
     "reviews": "Reviews",
     "noReviews": "No reviews yet. Be the first!",
     "viewOnMap": "View on Map",
-    "directions": "Get Directions"
+    "directions": "Get Directions",
+    "visitShop": "Visit Shop",
+    "allDietary": "All types",
+    "productSearch": "Product Search",
+    "productsAcrossShops": "{count} products across {shops} shops"
   },
   "admin": {
     "title": "Admin Panel",

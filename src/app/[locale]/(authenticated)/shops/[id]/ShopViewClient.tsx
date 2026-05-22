@@ -19,6 +19,7 @@ interface Product {
   discount: number;
   is_available: boolean;
   image_url: string | null;
+  dietary_type: 'vegan' | 'vegetarian' | 'flexitarian' | null;
 }
 
 interface Review {
@@ -230,17 +231,42 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
               const isUnavailable = !product.is_available || product.quantity === 0;
               const isRequested = localRequestedTitles.includes(product.name.toLowerCase());
               return (
-                <div key={product.id} className={`glass-card overflow-hidden ${isUnavailable ? 'opacity-70' : ''}`}>
-                  {product.image_url && (
-                    <div className="relative w-full h-40">
-                      <Image src={product.image_url} alt={product.name} fill className="object-cover" />
-                      {isUnavailable && (
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <span className="bg-white/90 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">{t('user.unavailable')}</span>
-                        </div>
-                      )}
+                <div key={product.id} className={`glass-card overflow-hidden relative transition-all ${isUnavailable ? 'opacity-70' : ''} ${product.discount > 0 ? 'ring-2 ring-accent/50 shadow-lg shadow-accent/10' : ''}`}>
+                  {/* SALE ribbon */}
+                  {product.discount > 0 && (
+                    <div className="absolute top-2 left-2 z-10 bg-accent text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                      SALE -{product.discount}%
                     </div>
                   )}
+                  {/* Always show image area with placeholder */}
+                  <div className="relative w-full h-40 bg-surface">
+                    {product.image_url ? (
+                      <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-primary/5">
+                        <Package className="w-10 h-10 text-primary/20" />
+                        <span className="text-[10px] text-muted/40 font-medium uppercase tracking-wide">
+                          {t(`seller.categories.${product.category}` as 'seller.categories.fruits')}
+                        </span>
+                      </div>
+                    )}
+                    {isUnavailable && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span className="bg-white/90 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">{t('user.unavailable')}</span>
+                      </div>
+                    )}
+                    {/* Dietary badge on image */}
+                    {product.dietary_type && (
+                      <div className={`absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full shadow ${
+                        product.dietary_type === 'vegan' ? 'bg-green-500 text-white' :
+                        product.dietary_type === 'vegetarian' ? 'bg-lime-500 text-white' :
+                        'bg-orange-500 text-white'
+                      }`}>
+                        {product.dietary_type === 'vegan' ? '\uD83C\uDF31 Vegan' :
+                         product.dietary_type === 'vegetarian' ? '\uD83E\uDD57 Vegetarian' : '\uD83C\uDF57 Flexitarian'}
+                      </div>
+                    )}
+                  </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="min-w-0">
@@ -248,10 +274,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
                         <p className="text-xs text-muted capitalize mt-0.5">{t(`seller.categories.${product.category}` as 'seller.categories.fruits')}</p>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                        {product.discount > 0 && (
-                          <span className="px-1.5 py-0.5 text-[10px] font-bold bg-accent text-white rounded">-{product.discount}%</span>
-                        )}
-                        {!product.image_url && isUnavailable && (
+                        {!product.is_available && (
                           <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-full">{t('user.unavailable')}</span>
                         )}
                       </div>

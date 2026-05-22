@@ -85,6 +85,9 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
                 <Link href="/shops" className={navLink('/shops')}>
                   {t('nav.shops')}
                 </Link>
+                <Link href="/products" className={navLink('/products')}>
+                  {t('nav.products')}
+                </Link>
                 <Link href="/map" className={navLink('/map')}>
                   {t('nav.map')}
                 </Link>
@@ -186,6 +189,13 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t('nav.shops')}
+                  </Link>
+                  <Link
+                    href="/products"
+                    className={mobileNavLink('/products')}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {t('nav.products')}
                   </Link>
                   <Link
                     href="/map"

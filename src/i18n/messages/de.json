@@ -177,6 +177,11 @@
     "productAdded": "Produkt erfolgreich hinzugefuegt!",
     "noShops": "Du hast noch keine Laeden erstellt.",
     "noProducts": "Noch keine Produkte in diesem Laden.",
+    "dietaryType": "Ernaehrungstyp",
+    "dietaryNone": "Keine Einschraenkung",
+    "dietaryVegan": "Vegan",
+    "dietaryVegetarian": "Vegetarisch",
+    "dietaryFlexitarian": "Flexitarisch",
     "categories": {
       "fruits": "Obst",
       "vegetables": "Gemuese",
@@ -220,7 +225,11 @@
     "reviews": "Bewertungen",
     "noReviews": "Noch keine Bewertungen. Sei der Erste!",
     "viewOnMap": "Auf Karte anzeigen",
-    "directions": "Route berechnen"
+    "directions": "Route berechnen",
+    "visitShop": "Laden besuchen",
+    "allDietary": "Alle Typen",
+    "productSearch": "Produktsuche",
+    "productsAcrossShops": "{count} Produkte in {shops} Laeden"
   },
   "admin": {
     "title": "Admin-Bereich",

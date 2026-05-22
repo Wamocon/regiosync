@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Navigation, X, Loader2, MapPin, Store, AlertCircle } from 'lucide-react';
+import { useRouter } from '@/i18n/navigation';
 
 interface Shop {
   id: string;
@@ -92,10 +93,12 @@ function MapController({
   routeCoords,
   userPos,
   selectedShop,
+  isPro,
 }: {
   routeCoords: [number, number][];
   userPos: [number, number] | null;
   selectedShop: Shop | null;
+  isPro: boolean;
 }) {
   const map = useMap();
 
@@ -104,9 +107,11 @@ function MapController({
       const bounds = L.latLngBounds(routeCoords);
       map.fitBounds(bounds, { padding: [60, 60], animate: true, duration: 1.2 });
     } else if (selectedShop) {
-      map.flyTo([selectedShop.latitude, selectedShop.longitude], 13, { animate: true, duration: 1 });
+      // Cap flyTo zoom at maxZoom for free users (12 = city level)
+      const targetZoom = isPro ? 13 : Math.min(12, map.getMaxZoom());
+      map.flyTo([selectedShop.latitude, selectedShop.longitude], targetZoom, { animate: true, duration: 1 });
     }
-  }, [routeCoords, selectedShop, userPos, map]);
+  }, [routeCoords, selectedShop, userPos, map, isPro]);
 
   return null;
 }
@@ -118,6 +123,7 @@ interface LeafletMapProps {
 }
 
 export function LeafletMap({ shops, isPro, t }: LeafletMapProps) {
+  const router = useRouter();
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [routeData, setRouteData] = useState<RouteData | null>(null);
@@ -274,18 +280,18 @@ export function LeafletMap({ shops, isPro, t }: LeafletMapProps) {
         minZoom={5}
         maxZoom={isPro ? 18 : 12}
         style={{ height: '100%', width: '100%' }}
-        scrollWheelZoom={isPro}
-        zoomControl={isPro}
-        dragging={isPro}
-        doubleClickZoom={isPro}
-        touchZoom={isPro}
+        scrollWheelZoom={true}
+        zoomControl={true}
+        dragging={true}
+        doubleClickZoom={true}
+        touchZoom={true}
         attributionControl={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <MapController routeCoords={routeData?.coords ?? []} userPos={userPos} selectedShop={selectedShop} />
+        <MapController routeCoords={routeData?.coords ?? []} userPos={userPos} selectedShop={selectedShop} isPro={isPro} />
 
         {/* Route polyline */}
         {routeData && (
@@ -318,12 +324,24 @@ export function LeafletMap({ shops, isPro, t }: LeafletMapProps) {
               <div className="p-1 min-w-40">
                 <div className="flex items-center gap-1.5 mb-1">
                   <Store className="w-3.5 h-3.5 text-green-600 shrink-0" />
-                  <h3 className="font-bold text-sm leading-tight">{shop.name}</h3>
+                  <button
+                    onClick={() => router.push(`/shops/${shop.id}`)}
+                    className="font-bold text-sm leading-tight text-left hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+                  >
+                    {shop.name}
+                  </button>
                 </div>
                 <div className="flex items-center gap-1 text-gray-500 text-xs mb-2">
                   <MapPin className="w-3 h-3 shrink-0" />
                   <span>{shop.city || shop.address}</span>
                 </div>
+                <button
+                  onClick={() => router.push(`/shops/${shop.id}`)}
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md text-xs font-medium transition-colors mb-2"
+                >
+                  <Store className="w-3 h-3" />
+                  {t('user.visitShop')}
+                </button>
                 {isPro && (
                   <button
                     onClick={() => requestDirections(shop)}

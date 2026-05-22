@@ -18,6 +18,7 @@ interface Product {
   discount: number;
   is_available: boolean;
   image_url: string | null;
+  dietary_type: 'vegan' | 'vegetarian' | 'flexitarian' | null;
 }
 
 interface Shop {
@@ -43,6 +44,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
   const [qty, setQty] = useState('');
   const [category, setCategory] = useState('other');
   const [discount, setDiscount] = useState('0');
+  const [dietaryType, setDietaryType] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,7 +53,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
 
   const resetForm = () => {
     setName(''); setDesc(''); setPrice(''); setQty('');
-    setCategory('other'); setDiscount('0');
+    setCategory('other'); setDiscount('0'); setDietaryType('');
     setImageFile(null); setImagePreview(null);
     setEditingProductId(null); setShowForm(false);
   };
@@ -67,6 +69,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
     setQty(product.quantity.toString());
     setCategory(product.category);
     setDiscount(product.discount.toString());
+    setDietaryType(product.dietary_type ?? '');
     setImagePreview(product.image_url);
     setImageFile(null);
     setShowForm(true);
@@ -107,6 +110,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
       category,
       discount: discountNum,
       is_available: qtyNum > 0,
+      dietary_type: dietaryType || null,
       ...(imageUrl ? { image_url: imageUrl } : {}),
     };
 
@@ -221,6 +225,26 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                 </select>
               </div>
             </div>
+            {/* Dietary type */}
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('seller.dietaryType')}</label>
+              <div className="flex flex-wrap gap-2">
+                {([['', t('seller.dietaryNone')], ['vegan', `\uD83C\uDF31 ${t('seller.dietaryVegan')}`], ['vegetarian', `\uD83E\uDD57 ${t('seller.dietaryVegetarian')}`], ['flexitarian', `\uD83C\uDF57 ${t('seller.dietaryFlexitarian')}`]] as [string, string][]).map(([val, label]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setDietaryType(val)}
+                    className={`px-3 py-1.5 rounded-xl text-sm font-medium border transition-all ${
+                      dietaryType === val
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-surface border-border hover:bg-surface-hover'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('seller.productDescription')}</label>
               <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} className={`${inputCls} resize-none`} />
@@ -298,6 +322,16 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                 {product.discount > 0 && (
                   <div className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-accent text-white text-[10px] font-bold rounded-full shadow">
                     {t('seller.saleLabel')} -{product.discount}%
+                  </div>
+                )}
+                {/* Dietary badge */}
+                {product.dietary_type && (
+                  <div className={`absolute top-2 right-2 z-10 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow ${
+                    product.dietary_type === 'vegan' ? 'bg-green-100 text-green-700' :
+                    product.dietary_type === 'vegetarian' ? 'bg-lime-100 text-lime-700' :
+                    'bg-orange-100 text-orange-700'
+                  }`}>
+                    {product.dietary_type === 'vegan' ? '🌱' : product.dietary_type === 'vegetarian' ? '🥗' : '🍗'}
                   </div>
                 )}
                 {/* Always show image area for consistent card height */}
