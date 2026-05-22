@@ -263,22 +263,6 @@ export function SellerDashboardClient({
                     className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
                 </div>
               </div>
-              {/* GPS location */}
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('seller.shopLocation')}</label>
-                <div className="flex items-center gap-2">
-                  <button type="button" onClick={handleGetLocation} disabled={gettingLocation}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-surface hover:bg-surface-hover transition-colors text-sm disabled:opacity-50">
-                    <Navigation className="w-4 h-4 text-primary" />
-                    {gettingLocation ? t('seller.geolocationNotSupported') : t('seller.useGPS')}
-                  </button>
-                  {editLat !== null && editLng !== null && (
-                    <span className="text-xs text-muted font-mono">
-                      {editLat.toFixed(5)}, {editLng.toFixed(5)}
-                    </span>
-                  )}
-                </div>
-              </div>
             </div>
             <div className="flex gap-3 mt-5">
               <button onClick={handleSaveShop} disabled={editLoading}

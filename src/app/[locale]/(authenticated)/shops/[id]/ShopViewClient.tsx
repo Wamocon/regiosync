@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Star, MapPin, Package, Send, Lock, MessageSquare, CheckCircle, Bell, BellOff, Clock } from 'lucide-react';
+import { Star, MapPin, Package, Send, Lock, MessageSquare, CheckCircle, Bell, BellOff, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { HelpButton } from '@/components/ui/HelpButton';
 import Image from 'next/image';
 
@@ -246,28 +246,9 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
         )}
       </div>
 
-      {/* Opening Hours */}
+      {/* Opening Hours — collapsible dropdown */}
       {shop.shop_hours && shop.shop_hours.length > 0 && (
-        <div className="glass-card p-5 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Clock className="w-5 h-5 text-primary" />
-            <h2 className="font-bold">Opening Hours</h2>
-          </div>
-          <div className="space-y-2">
-            {DAY_NAMES.map((dayName, idx) => {
-              const hours = shop.shop_hours.find(h => h.day_of_week === idx);
-              const isToday = idx === todayIndex;
-              return (
-                <div key={idx} className={`flex items-center justify-between text-sm py-1.5 px-2 rounded-lg ${isToday ? 'bg-primary/5 font-semibold' : ''}`}>
-                  <span className={isToday ? 'text-primary' : 'text-foreground'}>{dayName}{isToday && ' (Today)'}</span>
-                  <span className={hours?.is_closed || !hours ? 'text-red-500' : 'text-muted'}>
-                    {!hours ? 'No schedule' : hours.is_closed ? 'Closed' : `${fmtTime(hours.open_time)} - ${fmtTime(hours.close_time)}`}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <HoursDropdown shopHours={shop.shop_hours} todayIndex={todayIndex} fmtTime={fmtTime} />
       )}
 
       {/* Products */}
@@ -497,6 +478,57 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+const DAY_NAMES_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function HoursDropdown({ shopHours, todayIndex, fmtTime }: {
+  shopHours: { day_of_week: number; open_time: string; close_time: string; is_closed: boolean }[];
+  todayIndex: number;
+  fmtTime: (t: string) => string;
+}) {
+  const [open, setOpen] = useState(false);
+  const todayHours = shopHours.find(h => h.day_of_week === todayIndex);
+  const todaySummary = !todayHours
+    ? 'No schedule'
+    : todayHours.is_closed
+    ? 'Closed today'
+    : `${fmtTime(todayHours.open_time)} - ${fmtTime(todayHours.close_time)}`;
+
+  return (
+    <div className="glass-card mb-6 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface-hover transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Clock className="w-5 h-5 text-primary" />
+          <span className="font-bold">Opening Hours</span>
+          <span className="text-sm text-muted ml-2">{todaySummary}</span>
+        </div>
+        {open ? <ChevronUp className="w-4 h-4 text-muted" /> : <ChevronDown className="w-4 h-4 text-muted" />}
+      </button>
+      {open && (
+        <div className="px-5 pb-4 space-y-2 border-t border-border">
+          {DAY_NAMES_FULL.map((dayName, idx) => {
+            const hours = shopHours.find(h => h.day_of_week === idx);
+            const isToday = idx === todayIndex;
+            return (
+              <div key={idx} className={`flex items-center justify-between text-sm py-1.5 px-2 rounded-lg ${isToday ? 'bg-primary/5 font-semibold' : ''}`}>
+                <span className={isToday ? 'text-primary' : 'text-foreground'}>
+                  {dayName}{isToday && ' (Today)'}
+                </span>
+                <span className={hours?.is_closed || !hours ? 'text-red-500' : 'text-muted'}>
+                  {!hours ? 'No schedule' : hours.is_closed ? 'Closed' : `${fmtTime(hours.open_time)} - ${fmtTime(hours.close_time)}`}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
