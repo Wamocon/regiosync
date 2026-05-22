@@ -21,9 +21,9 @@ export default async function ShopsPage({ params }: { params: Promise<{ locale: 
       *,
       owner:owner_id(full_name),
       products(id, name, price, category, discount, is_available),
-      reviews(rating)
+      reviews(rating),
+      shop_hours(*)
     `)
-    .eq('is_active', true)
     .order('created_at', { ascending: false });
 
   return <ShopsClient shops={shops ?? []} isPro={profile?.is_pro ?? false} />;

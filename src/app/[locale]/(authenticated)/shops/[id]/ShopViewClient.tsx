@@ -5,9 +5,16 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Star, MapPin, Package, Send, Lock, MessageSquare, CheckCircle, Bell, BellOff } from 'lucide-react';
+import { Star, MapPin, Package, Send, Lock, MessageSquare, CheckCircle, Bell, BellOff, Clock } from 'lucide-react';
 import { HelpButton } from '@/components/ui/HelpButton';
 import Image from 'next/image';
+
+interface ShopHour {
+  day_of_week: number;
+  open_time: string;
+  close_time: string;
+  is_closed: boolean;
+}
 
 interface Product {
   id: string;
@@ -41,9 +48,11 @@ interface Shop {
   address: string;
   city: string;
   country: string;
+  is_active: boolean;
   owner: { full_name: string; email: string } | null;
   products: Product[];
   reviews: Review[];
+  shop_hours: ShopHour[];
 }
 
 export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSubscribedToShop = false, subscribedProductIds = [] }: {
@@ -73,6 +82,17 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
   const avgRating = shop.reviews.length > 0
     ? (shop.reviews.reduce((sum, r) => sum + r.rating, 0) / shop.reviews.length).toFixed(1)
     : null;
+
+  const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayIndex = new Date().getDay();
+
+  function fmtTime(t: string): string {
+    const [h, m] = t.split(':');
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const h12 = hour % 12 || 12;
+    return `${h12}:${m} ${ampm}`;
+  }
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,6 +177,18 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      {/* Closed banner */}
+      {!shop.is_active && (
+        <div className="flex items-center gap-3 px-5 py-3.5 mb-5 rounded-xl bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800">
+          <Clock className="w-5 h-5 text-red-500 shrink-0" />
+          <div>
+            <p className="font-semibold text-red-700 dark:text-red-400">{t('user.closed')} — This shop is temporarily closed</p>
+            <p className="text-xs text-red-600/80 dark:text-red-400/70 mt-0.5">Check the opening hours below to plan your visit</p>
+          </div>
+        </div>
+      )}
+
       {/* Shop Header */}
       <div className="glass-card p-6 mb-6">
         <div className="flex items-start justify-between">
@@ -213,6 +245,30 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
           <p className="mt-4 text-muted">{shop.description}</p>
         )}
       </div>
+
+      {/* Opening Hours */}
+      {shop.shop_hours && shop.shop_hours.length > 0 && (
+        <div className="glass-card p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="w-5 h-5 text-primary" />
+            <h2 className="font-bold">Opening Hours</h2>
+          </div>
+          <div className="space-y-2">
+            {DAY_NAMES.map((dayName, idx) => {
+              const hours = shop.shop_hours.find(h => h.day_of_week === idx);
+              const isToday = idx === todayIndex;
+              return (
+                <div key={idx} className={`flex items-center justify-between text-sm py-1.5 px-2 rounded-lg ${isToday ? 'bg-primary/5 font-semibold' : ''}`}>
+                  <span className={isToday ? 'text-primary' : 'text-foreground'}>{dayName}{isToday && ' (Today)'}</span>
+                  <span className={hours?.is_closed || !hours ? 'text-red-500' : 'text-muted'}>
+                    {!hours ? 'No schedule' : hours.is_closed ? 'Closed' : `${fmtTime(hours.open_time)} - ${fmtTime(hours.close_time)}`}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Products */}
       <div className="mb-8">

@@ -21,6 +21,7 @@ interface PlanCardProps {
   badge?: string;
   price: string;
   period: string;
+  subNote?: string;
   desc: string;
   features: { label: string; included: boolean }[];
   cta: string;
@@ -30,7 +31,7 @@ interface PlanCardProps {
   current?: boolean;
 }
 
-function PlanCard({ name, badge, price, period, desc, features, cta, ctaHref, highlight, current, currentPlanLabel }: PlanCardProps) {
+function PlanCard({ name, badge, price, period, subNote, desc, features, cta, ctaHref, highlight, current, currentPlanLabel }: PlanCardProps) {
   return (
     <div className={`glass-card p-8 relative flex flex-col ${highlight ? 'border-2 border-primary' : ''}`}>
       {badge && (
@@ -46,6 +47,7 @@ function PlanCard({ name, badge, price, period, desc, features, cta, ctaHref, hi
       <div className="mb-6">
         <span className="text-4xl font-bold">{price}</span>
         <span className="text-muted ml-1 text-sm">{period}</span>
+        {subNote && <p className="text-xs text-muted mt-1">{subNote}</p>}
       </div>
       <ul className="space-y-2.5 mb-8 flex-1">
         {features.map((f, i) => (
@@ -82,11 +84,19 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
   const [yearly, setYearly] = useState(false);
   const [tab, setTab] = useState<Tab>('user');
 
-  const moMult = yearly ? 0.8 : 1;
-  const userProPrice = (4.99 * moMult).toFixed(2);
+  const userProMonthly = 4.99;
+  const sellerProMonthly = 9.99;
+
+  // Annual totals (20% off 12 months)
+  const userProYearlyTotal = (userProMonthly * 12 * 0.8).toFixed(2);
+  const sellerProYearlyTotal = (sellerProMonthly * 12 * 0.8).toFixed(2);
+
+  const userProPrice = yearly ? userProYearlyTotal : userProMonthly.toFixed(2);
   const sellerFreePrice = '0';
-  const sellerProPrice = (9.99 * moMult).toFixed(2);
+  const sellerProPrice = yearly ? sellerProYearlyTotal : sellerProMonthly.toFixed(2);
   const period = yearly ? t('pricing.perYear') : t('pricing.perMonth');
+  const userProSubNote = yearly ? `≈ €${(userProMonthly * 0.8).toFixed(2)}/mo · ${t('pricing.billedAnnually')}` : '';
+  const sellerProSubNote = yearly ? `≈ €${(sellerProMonthly * 0.8).toFixed(2)}/mo · ${t('pricing.billedAnnually')}` : '';
   const currentPlanLabel = t('pricing.currentPlanButton');
 
   const userPlans: PlanCardProps[] = [
@@ -115,6 +125,7 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
       badge: t('pricing.badgeMostPopular'),
       price: userProPrice,
       period,
+      subNote: userProSubNote || undefined,
       desc: t('pricing.userProDesc'),
       cta: t('pricing.upgradeToPro'),
       ctaHref: '/register',
@@ -161,6 +172,7 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
       badge: t('pricing.badgeBestForSellers'),
       price: sellerProPrice,
       period,
+      subNote: sellerProSubNote || undefined,
       desc: t('pricing.sellerProDesc'),
       cta: t('pricing.goSellerPro'),
       ctaHref: '/register',

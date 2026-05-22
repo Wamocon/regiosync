@@ -37,8 +37,9 @@ export default async function SellerDashboardPage({ params }: { params: Promise<
   const { data: reviews } = shopIds.length > 0
     ? await supabase
         .from('reviews')
-        .select('*')
+        .select('*, user:user_id(full_name)')
         .in('shop_id', shopIds)
+        .order('created_at', { ascending: false })
     : { data: [] };
 
   return (

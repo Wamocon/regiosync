@@ -21,7 +21,8 @@ export default async function ShopViewPage({ params }: { params: Promise<{ local
       *,
       owner:owner_id(full_name, email),
       products(*),
-      reviews(*, user:user_id(full_name))
+      reviews(*, user:user_id(full_name)),
+      shop_hours(*)
     `)
     .eq('id', id)
     .single();
