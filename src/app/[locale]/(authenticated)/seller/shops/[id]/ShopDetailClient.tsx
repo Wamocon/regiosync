@@ -99,20 +99,68 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
     let imageUrl: string | null = null;
     if (imageFile) imageUrl = await uploadImage();
 
+    const discountNum = parseInt(discount) || 0;
     const payload = {
       name, description: desc,
       price: parseFloat(price),
       quantity: qtyNum,
       category,
-      discount: parseInt(discount) || 0,
+      discount: discountNum,
       is_available: qtyNum > 0,
       ...(imageUrl ? { image_url: imageUrl } : {}),
     };
 
     if (formMode === 'add') {
-      await supabase.from('products').insert({ shop_id: shop.id, ...payload });
+      const { data: newProduct } = await supabase.from('products').insert({ shop_id: shop.id, ...payload }).select('id').single();
+      // Notify all shop subscribers about the new product
+      if (newProduct) {
+        const { data: subs } = await supabase.from('shop_subscriptions').select('user_id').eq('shop_id', shop.id);
+        if (subs && subs.length > 0) {
+          await supabase.from('notifications').insert(
+            subs.map((s: { user_id: string }) => ({
+              user_id: s.user_id,
+              type: 'new_product',
+              title: `New product at ${shop.name}`,
+              message: `${name} is now available${discountNum > 0 ? ` with ${discountNum}% off` : ''}.`,
+              link: `/shops/${shop.id}`,
+            }))
+          );
+        }
+      }
     } else if (editingProductId) {
+      // Fetch old product to detect changes for product subscribers
+      const { data: oldProduct } = await supabase.from('products').select('discount, is_available').eq('id', editingProductId).single();
       await supabase.from('products').update(payload).eq('id', editingProductId);
+
+      // Notify product subscribers on discount added or item back in stock
+      if (oldProduct) {
+        const { data: productSubs } = await supabase.from('product_subscriptions').select('user_id').eq('product_id', editingProductId);
+        const notifs: { user_id: string; type: string; title: string; message: string; link: string }[] = [];
+
+        if (discountNum > 0 && discountNum !== oldProduct.discount) {
+          productSubs?.forEach((s: { user_id: string }) => {
+            notifs.push({
+              user_id: s.user_id,
+              type: 'discount',
+              title: `${name} is now ${discountNum}% off!`,
+              message: `The price dropped at ${shop.name}. Check it out now.`,
+              link: `/shops/${shop.id}`,
+            });
+          });
+        } else if (qtyNum > 0 && !oldProduct.is_available) {
+          productSubs?.forEach((s: { user_id: string }) => {
+            notifs.push({
+              user_id: s.user_id,
+              type: 'back_in_stock',
+              title: `${name} is back in stock!`,
+              message: `Available again at ${shop.name}.`,
+              link: `/shops/${shop.id}`,
+            });
+          });
+        }
+
+        if (notifs.length > 0) await supabase.from('notifications').insert(notifs);
+      }
     }
     resetForm(); setLoading(false); router.refresh();
   };

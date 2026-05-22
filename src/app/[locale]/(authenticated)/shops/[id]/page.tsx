@@ -37,12 +37,21 @@ export default async function ShopViewPage({ params }: { params: Promise<{ local
 
   const requestedTitles = (existingRequests ?? []).map((r: { title: string }) => r.title.toLowerCase());
 
+  // Fetch subscription state
+  const [{ data: shopSub }, { data: productSubs }] = await Promise.all([
+    supabase.from('shop_subscriptions').select('id').eq('user_id', user.id).eq('shop_id', id).maybeSingle(),
+    supabase.from('product_subscriptions').select('product_id').eq('user_id', user.id),
+  ]);
+  const subscribedProductIds = (productSubs ?? []).map((s: { product_id: string }) => s.product_id);
+
   return (
     <ShopViewClient
       shop={shop}
       userId={user.id}
       isPro={profile?.is_pro ?? false}
       requestedTitles={requestedTitles}
+      isSubscribedToShop={!!shopSub}
+      subscribedProductIds={subscribedProductIds}
     />
   );
 }

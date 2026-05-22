@@ -271,15 +271,17 @@ export function LeafletMap({ shops, isPro, t }: LeafletMapProps) {
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
+        minZoom={5}
+        maxZoom={isPro ? 18 : 12}
         style={{ height: '100%', width: '100%' }}
         scrollWheelZoom={isPro}
         zoomControl={isPro}
         dragging={isPro}
         doubleClickZoom={isPro}
         touchZoom={isPro}
+        attributionControl={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 

@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Star, MapPin, Package, Send, Lock, MessageSquare, CheckCircle } from 'lucide-react';
+import { Star, MapPin, Package, Send, Lock, MessageSquare, CheckCircle, Bell, BellOff } from 'lucide-react';
 import { HelpButton } from '@/components/ui/HelpButton';
 import Image from 'next/image';
 
@@ -45,11 +45,13 @@ interface Shop {
   reviews: Review[];
 }
 
-export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
+export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSubscribedToShop = false, subscribedProductIds = [] }: {
   shop: Shop;
   userId: string;
   isPro: boolean;
   requestedTitles?: string[];
+  isSubscribedToShop?: boolean;
+  subscribedProductIds?: string[];
 }) {
   const t = useTranslations();
   const router = useRouter();
@@ -63,6 +65,9 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
   const [requestTitle, setRequestTitle] = useState('');
   const [requestDesc, setRequestDesc] = useState('');
   const [loading, setLoading] = useState(false);
+  const [shopSubscribed, setShopSubscribed] = useState(isSubscribedToShop);
+  const [productSubscriptions, setProductSubscriptions] = useState<Set<string>>(new Set(subscribedProductIds));
+  const [subLoading, setSubLoading] = useState<string | null>(null);
 
   const avgRating = shop.reviews.length > 0
     ? (shop.reviews.reduce((sum, r) => sum + r.rating, 0) / shop.reviews.length).toFixed(1)
@@ -97,6 +102,31 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
     setRequestDesc('');
     setRequestingProduct(productName);
     setShowRequestForm(true);
+  };
+
+  const toggleShopSubscription = async () => {
+    setSubLoading('shop');
+    if (shopSubscribed) {
+      await supabase.from('shop_subscriptions').delete().eq('user_id', userId).eq('shop_id', shop.id);
+      setShopSubscribed(false);
+    } else {
+      await supabase.from('shop_subscriptions').insert({ user_id: userId, shop_id: shop.id });
+      setShopSubscribed(true);
+    }
+    setSubLoading(null);
+  };
+
+  const toggleProductSubscription = async (productId: string) => {
+    setSubLoading(productId);
+    const isSubbed = productSubscriptions.has(productId);
+    if (isSubbed) {
+      await supabase.from('product_subscriptions').delete().eq('user_id', userId).eq('product_id', productId);
+      setProductSubscriptions((prev) => { const s = new Set(prev); s.delete(productId); return s; });
+    } else {
+      await supabase.from('product_subscriptions').insert({ user_id: userId, product_id: productId });
+      setProductSubscriptions((prev) => new Set(prev).add(productId));
+    }
+    setSubLoading(null);
   };
 
   const handleSubmitRequest = async (e: React.FormEvent) => {
@@ -145,8 +175,21 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap justify-end">
             <HelpButton content={t('help.pages.shopDetail')} />
+            {/* Subscribe to shop */}
+            <button
+              onClick={toggleShopSubscription}
+              disabled={subLoading === 'shop'}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                shopSubscribed
+                  ? 'bg-primary/10 text-primary border border-primary/30 hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/20'
+                  : 'bg-surface border border-border hover:bg-surface-hover'
+              }`}
+            >
+              {shopSubscribed ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+              {shopSubscribed ? 'Unsubscribe' : 'Subscribe'}
+            </button>
             {isPro ? (
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${shop.latitude},${shop.longitude}`}
@@ -230,8 +273,8 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
                       </div>
                       <span className="text-xs text-muted">{product.quantity} {t('user.available')}</span>
                     </div>
-                    {/* Per-product request button */}
-                    <div className="mt-3">
+                    {/* Per-product request + subscribe buttons */}
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
                       {isRequested ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-primary/10 text-primary">
                           <CheckCircle className="w-3.5 h-3.5" />
@@ -246,6 +289,19 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
                           {t('user.requestProduct')}
                         </button>
                       )}
+                      <button
+                        onClick={() => toggleProductSubscription(product.id)}
+                        disabled={subLoading === product.id}
+                        title={productSubscriptions.has(product.id) ? 'Unsubscribe from product alerts' : 'Get alerts for discounts & restocks'}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                          productSubscriptions.has(product.id)
+                            ? 'bg-primary/10 text-primary border border-primary/30'
+                            : 'border border-border hover:bg-surface-hover'
+                        }`}
+                      >
+                        {productSubscriptions.has(product.id) ? <BellOff className="w-3.5 h-3.5" /> : <Bell className="w-3.5 h-3.5" />}
+                        {productSubscriptions.has(product.id) ? 'Subscribed' : 'Alert me'}
+                      </button>
                     </div>
                   </div>
                 </div>

@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
-import { Menu, X, Bell, User, LogOut, ShoppingBag } from 'lucide-react';
+import { NotificationBell } from '@/components/ui/NotificationBell';
+import { Menu, X, User, LogOut, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
@@ -102,13 +103,7 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
             {/* Authenticated icons (desktop only) */}
             {user ? (
               <div className="hidden md:flex items-center gap-1">
-                <Link
-                  href="/notifications"
-                  className="p-2 rounded-lg hover:bg-surface-hover transition-colors"
-                  aria-label={t('nav.notifications')}
-                >
-                  <Bell className="w-5 h-5 text-muted" />
-                </Link>
+                <NotificationBell userId={user.id} />
                 <Link
                   href="/profile"
                   className="p-2 rounded-lg hover:bg-surface-hover transition-colors"
