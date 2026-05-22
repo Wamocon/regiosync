@@ -278,7 +278,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
                   {/* Always show image area with placeholder */}
                   <div className="relative w-full h-40 bg-surface">
                     {product.image_url ? (
-                      <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                      <Image src={product.image_url} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-primary/5">
                         <Package className="w-10 h-10 text-primary/20" />

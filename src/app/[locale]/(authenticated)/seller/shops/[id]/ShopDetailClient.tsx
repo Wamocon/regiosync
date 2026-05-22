@@ -272,7 +272,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
               <div className="flex items-start gap-4">
                 {imagePreview ? (
                   <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-border shrink-0">
-                    <Image src={imagePreview} alt="Preview" fill className="object-cover" unoptimized={imagePreview.startsWith('data:')} />
+                    <Image src={imagePreview} alt="Preview" fill sizes="80px" className="object-cover" unoptimized={imagePreview.startsWith('data:')} />
                     <button type="button" onClick={() => { setImagePreview(null); setImageFile(null); }}
                       className="absolute top-1 right-1 bg-black/50 rounded-full p-0.5">
                       <X className="w-3 h-3 text-white" />
@@ -337,7 +337,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                 {/* Always show image area for consistent card height */}
                 <div className="relative w-full h-36 bg-surface">
                   {product.image_url ? (
-                    <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                    <Image src={product.image_url} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <Package className="w-10 h-10 text-muted/30" />

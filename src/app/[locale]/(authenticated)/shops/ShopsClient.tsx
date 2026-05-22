@@ -108,7 +108,7 @@ export function ShopsClient({ shops, isPro }: { shops: Shop[]; isPro: boolean })
               {/* Shop image */}
               {shop.image_url ? (
                 <div className="relative w-full h-36">
-                  <Image src={shop.image_url} alt={shop.name} fill className="object-cover" />
+                  <Image src={shop.image_url} alt={shop.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
                 </div>
               ) : (
                 <div className="w-full h-28 bg-primary/5 flex items-center justify-center">

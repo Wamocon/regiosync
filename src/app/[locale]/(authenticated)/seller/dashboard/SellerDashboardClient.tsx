@@ -208,7 +208,7 @@ export function SellerDashboardClient({
                 <div className="flex items-start gap-3">
                   {editImagePreview ? (
                     <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-border shrink-0">
-                      <Image src={editImagePreview} alt="Shop" fill className="object-cover" unoptimized={editImagePreview.startsWith('data:')} />
+                      <Image src={editImagePreview} alt="Shop" fill sizes="80px" className="object-cover" unoptimized={editImagePreview.startsWith('data:')} />
                       <button type="button" onClick={() => { setEditImagePreview(null); setEditImageFile(null); }}
                         className="absolute top-1 right-1 bg-black/50 rounded-full p-0.5">
                         <X className="w-3 h-3 text-white" />
@@ -328,7 +328,7 @@ export function SellerDashboardClient({
                 {/* Shop image */}
                 {shop.image_url ? (
                   <div className="relative w-full h-36">
-                    <Image src={shop.image_url} alt={shop.name} fill className="object-cover" />
+                    <Image src={shop.image_url} alt={shop.name} fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
                   </div>
                 ) : (
                   <div className="w-full h-28 bg-primary/5 flex items-center justify-center">

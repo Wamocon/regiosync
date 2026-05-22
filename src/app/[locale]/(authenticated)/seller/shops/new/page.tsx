@@ -187,7 +187,7 @@ export default function NewShopPage() {
             <div className="flex items-start gap-4">
               {imagePreview ? (
                 <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-border shrink-0">
-                  <Image src={imagePreview} alt="Shop preview" fill className="object-cover" unoptimized />
+                  <Image src={imagePreview} alt="Shop preview" fill sizes="96px" className="object-cover" unoptimized />
                   <button
                     type="button"
                     onClick={() => { setImagePreview(null); setImageFile(null); }}
