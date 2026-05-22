@@ -3,7 +3,8 @@
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Bell, Check, HelpCircle } from 'lucide-react';
+import { Bell, Check } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 
 interface Notification {
   id: string;
@@ -40,9 +41,7 @@ export function NotificationsClient({ notifications }: { notifications: Notifica
           <button onClick={handleMarkAllRead} className="px-3 py-1.5 text-sm bg-surface border border-border rounded-lg hover:bg-surface-hover">
             {t('notifications.markAllRead')}
           </button>
-          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.notifications')}>
-            <HelpCircle className="w-5 h-5 text-muted" />
-          </div>
+          <HelpButton content={t('help.pages.notifications')} />
         </div>
       </div>
 

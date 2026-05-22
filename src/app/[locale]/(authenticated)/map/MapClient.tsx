@@ -3,7 +3,8 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useSyncExternalStore } from 'react';
-import { Lock, HelpCircle } from 'lucide-react';
+import { Lock } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 import dynamic from 'next/dynamic';
 
 const LeafletMap = dynamic(
@@ -52,9 +53,7 @@ export function MapClient({ shops, isPro }: { shops: Shop[]; isPro: boolean }) {
           <h1 className="text-3xl font-bold">{t('map.title')}</h1>
           <p className="text-muted mt-1">{shops.length} {t('nav.shops')}</p>
         </div>
-        <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.map')}>
-          <HelpCircle className="w-5 h-5 text-muted" />
-        </div>
+        <HelpButton content={t('help.pages.map')} />
       </div>
 
       {!isPro && (

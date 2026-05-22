@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, Link } from '@/i18n/navigation';
-import { User, Mail, Shield, Crown, Calendar, HelpCircle, Camera } from 'lucide-react';
+import { User, Mail, Shield, Crown, Calendar, Camera } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 import Image from 'next/image';
 
 interface Profile {
@@ -60,12 +61,7 @@ export function ProfileClient({ profile }: { profile: Profile }) {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
-        <div
-          className="p-2 rounded-lg hover:bg-surface-hover cursor-help"
-          title={t('help.pages.profile')}
-        >
-          <HelpCircle className="w-5 h-5 text-muted" />
-        </div>
+        <HelpButton content={t('help.pages.profile')} />
       </div>
 
       <div className="glass-card p-6">

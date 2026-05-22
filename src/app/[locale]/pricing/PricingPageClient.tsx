@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Check, Star, HelpCircle } from 'lucide-react';
+import { Check, Star } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 import { useState } from 'react';
 
 interface PricingPageClientProps {
@@ -25,8 +26,8 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">{t('pricing.title')}</h1>
             <p className="text-muted text-lg">{t('pricing.subtitle')}</p>
-            <div className="mt-2 p-2 rounded-lg hover:bg-surface-hover inline-flex cursor-help" title={t('help.pages.pricing')}>
-              <HelpCircle className="w-5 h-5 text-muted" />
+            <div className="mt-2 inline-flex">
+              <HelpButton content={t('help.pages.pricing')} />
             </div>
           </div>
 

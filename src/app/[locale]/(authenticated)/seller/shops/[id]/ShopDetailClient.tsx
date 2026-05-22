@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Plus, Trash2, Package, HelpCircle, Edit, X, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Package, Edit, X, Image as ImageIcon } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 import Image from 'next/image';
 
 interface Product {
@@ -137,9 +138,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
           <p className="text-muted mt-1">{shop.description}</p>
         </div>
         <div className="flex gap-2">
-          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.shopManage')}>
-            <HelpCircle className="w-5 h-5 text-muted" />
-          </div>
+          <HelpButton content={t('help.pages.shopManage')} />
           <button onClick={openAddForm}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-all text-sm font-medium whitespace-nowrap">
             <Plus className="w-4 h-4 shrink-0" />
@@ -191,7 +190,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">{t('seller.discount')} (%)</label>
+                <label className="block text-sm font-medium mb-1">{t('seller.discount')}</label>
                 <input type="number" min="0" max="100" value={discount} onChange={e => setDiscount(e.target.value)} className={inputCls} />
               </div>
             </div>
@@ -246,12 +245,23 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
           {shop.products.map((product) => {
             const isUnavailable = !product.is_available || product.quantity === 0;
             return (
-              <div key={product.id} className={`glass-card overflow-hidden ${isUnavailable ? 'opacity-70' : ''}`}>
-                {product.image_url && (
-                  <div className="relative w-full h-36">
-                    <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+              <div key={product.id} className={`glass-card overflow-hidden relative ${isUnavailable ? 'opacity-70' : ''} ${product.discount > 0 ? 'ring-2 ring-accent/40' : ''}`}>
+                {/* SALE ribbon */}
+                {product.discount > 0 && (
+                  <div className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-accent text-white text-[10px] font-bold rounded-full shadow">
+                    SALE -{product.discount}%
                   </div>
                 )}
+                {/* Always show image area for consistent card height */}
+                <div className="relative w-full h-36 bg-surface">
+                  {product.image_url ? (
+                    <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Package className="w-10 h-10 text-muted/30" />
+                    </div>
+                  )}
+                </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0">
@@ -275,17 +285,14 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                     <p className="text-xs text-muted mt-1.5 line-clamp-2">{product.description}</p>
                   )}
                   <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-lg font-bold text-primary">
                         {product.discount > 0
                           ? (product.price * (1 - product.discount / 100)).toFixed(2)
                           : product.price.toFixed(2)} EUR
                       </span>
                       {product.discount > 0 && (
-                        <>
-                          <span className="text-xs text-muted line-through">{product.price.toFixed(2)} EUR</span>
-                          <span className="px-1.5 py-0.5 text-[10px] font-bold bg-accent text-white rounded">-{product.discount}%</span>
-                        </>
+                        <span className="text-xs text-muted line-through">{product.price.toFixed(2)} EUR</span>
                       )}
                     </div>
                     <span className="text-xs text-muted">Qty: {product.quantity}</span>

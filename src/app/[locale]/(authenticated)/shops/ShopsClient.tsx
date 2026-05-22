@@ -3,7 +3,8 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
-import { Search, MapPin, Star, Store, Lock, HelpCircle } from 'lucide-react';
+import { Search, MapPin, Star, Store, Lock } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 
 interface Shop {
   id: string;
@@ -40,9 +41,7 @@ export function ShopsClient({ shops, isPro }: { shops: Shop[]; isPro: boolean })
           <h1 className="text-3xl font-bold">{t('user.nearbyShops')}</h1>
           <p className="text-muted mt-1">{filteredShops.length} {t('nav.shops')}</p>
         </div>
-        <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.shops')}>
-          <HelpCircle className="w-5 h-5 text-muted" />
-        </div>
+        <HelpButton content={t('help.pages.shops')} />
       </div>
 
       {/* Search */}

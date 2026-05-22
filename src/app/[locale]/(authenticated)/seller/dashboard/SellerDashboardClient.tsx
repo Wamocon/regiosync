@@ -5,7 +5,9 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Store, Package, Star, MessageSquare, Plus, MapPin, HelpCircle, Trash2, Edit, X, Save } from 'lucide-react';
+import { Store, Package, Star, MessageSquare, Plus, MapPin, Trash2, Edit, X, Save, Image as ImageIcon, ToggleLeft, ToggleRight } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
+import Image from 'next/image';
 
 interface Shop {
   id: string;
@@ -71,6 +73,8 @@ export function SellerDashboardClient({
   const [editAddress, setEditAddress] = useState('');
   const [editCity, setEditCity] = useState('');
   const [editLoading, setEditLoading] = useState(false);
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
   const supabase = createClient();
 
   const totalProducts = shops.reduce((sum, s) => sum + s.products.length, 0);
@@ -89,25 +93,59 @@ export function SellerDashboardClient({
     router.refresh();
   };
 
+  const handleEditImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setEditImageFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setEditImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadShopImage = async (shopId: string): Promise<string | null> => {
+    if (!editImageFile) return null;
+    const ext = editImageFile.name.split('.').pop();
+    const path = `shops/${shopId}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('shop-images').upload(path, editImageFile, { upsert: true });
+    if (error) return null;
+    const { data: urlData } = supabase.storage.from('shop-images').getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleToggleShopStatus = async (shop: Shop) => {
+    await supabase.from('shops').update({ is_active: !shop.is_active }).eq('id', shop.id);
+    router.refresh();
+  };
+
   const openEditShop = (shop: Shop) => {
     setEditingShop(shop);
     setEditName(shop.name);
     setEditDesc(shop.description);
     setEditAddress(shop.address);
     setEditCity(shop.city);
+    setEditImageFile(null);
+    setEditImagePreview(shop.image_url);
   };
 
   const handleSaveShop = async () => {
     if (!editingShop) return;
     setEditLoading(true);
+    let imageUrl: string | null | undefined = undefined;
+    if (editImageFile) {
+      imageUrl = await uploadShopImage(editingShop.id);
+    }
     await supabase.from('shops').update({
       name: editName,
       description: editDesc,
       address: editAddress,
       city: editCity,
+      ...(imageUrl !== undefined ? { image_url: imageUrl } : {}),
     }).eq('id', editingShop.id);
     setEditLoading(false);
     setEditingShop(null);
+    setEditImageFile(null);
+    setEditImagePreview(null);
     router.refresh();
   };
 
@@ -125,6 +163,31 @@ export function SellerDashboardClient({
               </button>
             </div>
             <div className="space-y-4">
+              {/* Shop image upload */}
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('seller.shopImage')}</label>
+                <div className="flex items-start gap-3">
+                  {editImagePreview ? (
+                    <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-border shrink-0">
+                      <Image src={editImagePreview} alt="Shop" fill className="object-cover" unoptimized={editImagePreview.startsWith('data:')} />
+                      <button type="button" onClick={() => { setEditImagePreview(null); setEditImageFile(null); }}
+                        className="absolute top-1 right-1 bg-black/50 rounded-full p-0.5">
+                        <X className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center shrink-0 bg-surface">
+                      <ImageIcon className="w-6 h-6 text-muted" />
+                    </div>
+                  )}
+                  <label className="flex-1 cursor-pointer">
+                    <div className="px-4 py-2.5 rounded-xl border border-border bg-surface hover:bg-surface-hover transition-colors text-sm text-center text-muted">
+                      {editImageFile ? editImageFile.name : 'Click to upload shop image'}
+                    </div>
+                    <input type="file" accept="image/*" onChange={handleEditImageChange} className="hidden" />
+                  </label>
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">{t('seller.shopName')}</label>
                 <input value={editName} onChange={e => setEditName(e.target.value)}
@@ -172,9 +235,7 @@ export function SellerDashboardClient({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.dashboard')}>
-            <HelpCircle className="w-5 h-5 text-muted" />
-          </div>
+          <HelpButton content={t('help.pages.dashboard')} />
           <Link href="/seller/shops/new" className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-all text-sm font-medium">
             <Plus className="w-4 h-4" />
             {t('seller.createShop')}
@@ -213,29 +274,64 @@ export function SellerDashboardClient({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {shops.map((shop) => (
-              <div key={shop.id} className="glass-card p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold">{shop.name}</h3>
-                    <p className="text-sm text-muted flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3" />
-                      {shop.city || shop.address}
-                    </p>
+              <div key={shop.id} className="glass-card overflow-hidden flex flex-col">
+                {/* Shop image */}
+                {shop.image_url ? (
+                  <div className="relative w-full h-36">
+                    <Image src={shop.image_url} alt={shop.name} fill className="object-cover" />
                   </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => openEditShop(shop)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-primary">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => handleDeleteShop(shop.id)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-red-500">
-                      <Trash2 className="w-4 h-4" />
+                ) : (
+                  <div className="w-full h-28 bg-primary/5 flex items-center justify-center">
+                    <Store className="w-8 h-8 text-primary/30" />
+                  </div>
+                )}
+
+                <div className="p-4 flex flex-col flex-1 gap-3">
+                  {/* Name + actions */}
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0">
+                      <h3 className="font-semibold truncate">{shop.name}</h3>
+                      <p className="text-xs text-muted flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3 h-3 shrink-0" />
+                        {shop.city || shop.address}
+                      </p>
+                    </div>
+                    <div className="flex gap-1 shrink-0 ml-2">
+                      <button onClick={() => openEditShop(shop)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-primary transition-colors" title="Edit shop">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDeleteShop(shop.id)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-red-500 transition-colors" title="Delete shop">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Status toggle + products count */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted">{shop.products.length} {t('nav.products')}</span>
+                    <button
+                      onClick={() => handleToggleShopStatus(shop)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                        shop.is_active
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'
+                          : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
+                      }`}
+                      title="Toggle open / closed"
+                    >
+                      {shop.is_active
+                        ? <><ToggleRight className="w-3.5 h-3.5" />{t('user.openNow')}</>
+                        : <><ToggleLeft className="w-3.5 h-3.5" />{t('user.closed')}</>}
                     </button>
                   </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted">
-                  <span>{shop.products.length} {t('nav.products')}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${shop.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700'}`}>
-                    {shop.is_active ? t('user.openNow') : t('user.closed')}
-                  </span>
+
+                  {/* Manage Products link */}
+                  <Link
+                    href={`/seller/shops/${shop.id}`}
+                    className="mt-auto flex items-center justify-center gap-2 w-full py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-colors text-sm font-medium"
+                  >
+                    <Package className="w-4 h-4" />
+                    {t('nav.products')} &amp; {t('seller.editProduct')}
+                  </Link>
                 </div>
               </div>
             ))}

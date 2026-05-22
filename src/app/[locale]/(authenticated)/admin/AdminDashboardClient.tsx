@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Users, ShieldCheck, Store, Ban, Trash2, UserCheck, AlertTriangle, HelpCircle } from 'lucide-react';
+import { Users, ShieldCheck, Store, Ban, Trash2, UserCheck, AlertTriangle } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 
 interface Profile {
   id: string;
@@ -73,9 +74,7 @@ export function AdminDashboardClient({ users, reports }: { users: Profile[]; rep
           <h1 className="text-3xl font-bold">{t('admin.title')}</h1>
           <p className="text-muted mt-1">{t('admin.userManagement')}</p>
         </div>
-        <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.admin')}>
-          <HelpCircle className="w-5 h-5 text-muted" />
-        </div>
+        <HelpButton content={t('help.pages.admin')} />
       </div>
 
       {/* Stats */}

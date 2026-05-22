@@ -5,7 +5,8 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Star, MapPin, Package, Send, Lock, HelpCircle, MessageSquare, CheckCircle } from 'lucide-react';
+import { Star, MapPin, Package, Send, Lock, MessageSquare, CheckCircle } from 'lucide-react';
+import { HelpButton } from '@/components/ui/HelpButton';
 import Image from 'next/image';
 
 interface Product {
@@ -145,9 +146,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [] }: {
             </div>
           </div>
           <div className="flex gap-2">
-            <div className="p-2 rounded-lg hover:bg-surface-hover cursor-help" title={t('help.pages.shopDetail')}>
-              <HelpCircle className="w-5 h-5 text-muted" />
-            </div>
+            <HelpButton content={t('help.pages.shopDetail')} />
             {isPro ? (
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${shop.latitude},${shop.longitude}`}
