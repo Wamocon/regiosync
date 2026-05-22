@@ -25,11 +25,12 @@ interface PlanCardProps {
   features: { label: string; included: boolean }[];
   cta: string;
   ctaHref: string;
+  currentPlanLabel: string;
   highlight?: boolean;
   current?: boolean;
 }
 
-function PlanCard({ name, badge, price, period, desc, features, cta, ctaHref, highlight, current }: PlanCardProps) {
+function PlanCard({ name, badge, price, period, desc, features, cta, ctaHref, highlight, current, currentPlanLabel }: PlanCardProps) {
   return (
     <div className={`glass-card p-8 relative flex flex-col ${highlight ? 'border-2 border-primary' : ''}`}>
       {badge && (
@@ -58,7 +59,7 @@ function PlanCard({ name, badge, price, period, desc, features, cta, ctaHref, hi
       </ul>
       {current ? (
         <div className="w-full py-3 text-center border border-primary text-primary rounded-xl font-medium text-sm">
-          Current Plan
+          {currentPlanLabel}
         </div>
       ) : (
         <Link
@@ -85,92 +86,97 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
   const userProPrice = (4.99 * moMult).toFixed(2);
   const sellerFreePrice = '0';
   const sellerProPrice = (9.99 * moMult).toFixed(2);
-  const period = yearly ? 'EUR / year' : 'EUR / month';
+  const period = yearly ? t('pricing.perYear') : t('pricing.perMonth');
+  const currentPlanLabel = t('pricing.currentPlanButton');
 
   const userPlans: PlanCardProps[] = [
     {
-      name: 'User Free',
+      name: t('pricing.userFreeName'),
       price: '0',
-      period: 'EUR — forever',
-      desc: 'Discover local shops at no cost',
-      cta: 'Get started',
+      period: t('pricing.foreverFree'),
+      desc: t('pricing.userFreeDesc'),
+      cta: t('pricing.getStartedCta'),
       ctaHref: '/register',
+      currentPlanLabel,
       features: [
-        { label: 'Browse up to 5 shops', included: true },
-        { label: 'View products & prices', included: true },
-        { label: 'Write shop reviews', included: true },
-        { label: 'Subscribe to shops & products', included: true },
-        { label: 'Basic map (country level)', included: true },
-        { label: 'Full interactive map + zoom', included: false },
-        { label: 'Get directions to shops', included: false },
-        { label: 'Unlimited shop browsing', included: false },
-        { label: 'Priority product requests', included: false },
+        { label: t('pricing.userFreeFeature1'), included: true },
+        { label: t('pricing.userFreeFeature2'), included: true },
+        { label: t('pricing.userFreeFeature3'), included: true },
+        { label: t('pricing.userFreeFeature4'), included: true },
+        { label: t('pricing.userFreeFeature5'), included: true },
+        { label: t('pricing.userFreeFeature6'), included: false },
+        { label: t('pricing.userFreeFeature7'), included: false },
+        { label: t('pricing.userFreeFeature8'), included: false },
+        { label: t('pricing.userFreeFeature9'), included: false },
       ],
     },
     {
-      name: 'User Pro',
-      badge: 'Most Popular',
+      name: t('pricing.userProName'),
+      badge: t('pricing.badgeMostPopular'),
       price: userProPrice,
       period,
-      desc: 'Full regional shopping experience',
-      cta: 'Upgrade to Pro',
+      desc: t('pricing.userProDesc'),
+      cta: t('pricing.upgradeToPro'),
       ctaHref: '/register',
       highlight: true,
+      currentPlanLabel,
       features: [
-        { label: 'Unlimited shop browsing', included: true },
-        { label: 'Full interactive map + zoom', included: true },
-        { label: 'Get directions to any shop', included: true },
-        { label: 'Subscribe to shops & products', included: true },
-        { label: 'Priority product requests', included: true },
-        { label: 'Exclusive deals & early access', included: true },
-        { label: 'Advanced search & filters', included: true },
-        { label: 'Push notification alerts', included: true },
+        { label: t('pricing.userProFeature1'), included: true },
+        { label: t('pricing.userProFeature2'), included: true },
+        { label: t('pricing.userProFeature3'), included: true },
+        { label: t('pricing.userProFeature4'), included: true },
+        { label: t('pricing.userProFeature5'), included: true },
+        { label: t('pricing.userProFeature6'), included: true },
+        { label: t('pricing.userProFeature7'), included: true },
+        { label: t('pricing.userProFeature8'), included: true },
       ],
     },
   ];
 
   const sellerPlans: PlanCardProps[] = [
     {
-      name: 'Seller Free',
+      name: t('pricing.sellerFreeName'),
       price: sellerFreePrice,
-      period: 'EUR — forever',
-      desc: 'Start selling locally for free',
-      cta: 'Register as Seller',
+      period: t('pricing.foreverFree'),
+      desc: t('pricing.sellerFreeDesc'),
+      cta: t('pricing.registerAsSeller'),
       ctaHref: '/register',
+      currentPlanLabel,
       features: [
-        { label: '1 shop listing', included: true },
-        { label: 'Up to 10 products per shop', included: true },
-        { label: 'Basic shop hours schedule', included: true },
-        { label: 'Manual open/close override', included: true },
-        { label: 'Receive product requests', included: true },
-        { label: 'Read customer reviews', included: true },
-        { label: 'Multiple shops', included: false },
-        { label: 'Unlimited products', included: false },
-        { label: 'Subscriber analytics', included: false },
-        { label: 'Priority placement in search', included: false },
-        { label: 'Discount campaign automation', included: false },
+        { label: t('pricing.sellerFreeFeature1'), included: true },
+        { label: t('pricing.sellerFreeFeature2'), included: true },
+        { label: t('pricing.sellerFreeFeature3'), included: true },
+        { label: t('pricing.sellerFreeFeature4'), included: true },
+        { label: t('pricing.sellerFreeFeature5'), included: true },
+        { label: t('pricing.sellerFreeFeature6'), included: true },
+        { label: t('pricing.sellerFreeFeature7'), included: false },
+        { label: t('pricing.sellerFreeFeature8'), included: false },
+        { label: t('pricing.sellerFreeFeature9'), included: false },
+        { label: t('pricing.sellerFreeFeature10'), included: false },
+        { label: t('pricing.sellerFreeFeature11'), included: false },
       ],
     },
     {
-      name: 'Seller Pro',
-      badge: 'Best for Sellers',
+      name: t('pricing.sellerProName'),
+      badge: t('pricing.badgeBestForSellers'),
       price: sellerProPrice,
       period,
-      desc: 'Grow your local business faster',
-      cta: 'Go Seller Pro',
+      desc: t('pricing.sellerProDesc'),
+      cta: t('pricing.goSellerPro'),
       ctaHref: '/register',
       highlight: true,
+      currentPlanLabel,
       features: [
-        { label: 'Unlimited shop listings', included: true },
-        { label: 'Unlimited products per shop', included: true },
-        { label: 'Full shop hours automation', included: true },
-        { label: 'Manual override with calendar', included: true },
-        { label: 'Subscriber analytics dashboard', included: true },
-        { label: 'Auto-notify subscribers on updates', included: true },
-        { label: 'Priority placement in search', included: true },
-        { label: 'Discount campaign automation', included: true },
-        { label: 'Featured badge on shop cards', included: true },
-        { label: 'Priority support', included: true },
+        { label: t('pricing.sellerProFeature1'), included: true },
+        { label: t('pricing.sellerProFeature2'), included: true },
+        { label: t('pricing.sellerProFeature3'), included: true },
+        { label: t('pricing.sellerProFeature4'), included: true },
+        { label: t('pricing.sellerProFeature5'), included: true },
+        { label: t('pricing.sellerProFeature6'), included: true },
+        { label: t('pricing.sellerProFeature7'), included: true },
+        { label: t('pricing.sellerProFeature8'), included: true },
+        { label: t('pricing.sellerProFeature9'), included: true },
+        { label: t('pricing.sellerProFeature10'), included: true },
       ],
     },
   ];
@@ -201,7 +207,7 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
               }`}
             >
               <Users className="w-4 h-4" />
-              For Buyers
+              {t('pricing.forBuyers')}
             </button>
             <button
               onClick={() => setTab('seller')}
@@ -210,7 +216,7 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
               }`}
             >
               <Store className="w-4 h-4" />
-              For Sellers
+              {t('pricing.forSellers')}
             </button>
           </div>
 
@@ -240,18 +246,11 @@ export function PricingPageClient({ user, userRole, isPro }: PricingPageClientPr
 
           {/* Note */}
           <p className="text-center text-xs text-muted mt-8">
-            All plans include a 14-day free trial. Cancel anytime. Prices shown exclude VAT.
+            {t('pricing.freeTrial')}
           </p>
         </div>
       </main>
       <Footer />
     </div>
   );
-}
-
-
-interface PricingPageClientProps {
-  user?: { id: string; email?: string } | null;
-  userRole?: string | null;
-  isPro?: boolean;
 }

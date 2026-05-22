@@ -7,15 +7,20 @@ import { Lock } from 'lucide-react';
 import { HelpButton } from '@/components/ui/HelpButton';
 import dynamic from 'next/dynamic';
 
+function MapLoadingFallback() {
+  const t = useTranslations();
+  return (
+    <div className="h-full flex items-center justify-center">
+      <p className="text-muted text-sm">{t('map.loadingMap')}</p>
+    </div>
+  );
+}
+
 const LeafletMap = dynamic(
   () => import('./LeafletMap').then((mod) => mod.LeafletMap),
   {
     ssr: false,
-    loading: () => (
-      <div className="h-full flex items-center justify-center">
-        <p className="text-muted text-sm">{t('map.loadingMap')}</p>
-      </div>
-    ),
+    loading: () => <MapLoadingFallback />,
   }
 );
 

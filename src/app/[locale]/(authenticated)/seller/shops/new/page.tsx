@@ -109,7 +109,7 @@ export default function NewShopPage() {
 
   const handleUseGPS = () => {
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported');
+      setError(t('seller.geolocationNotSupported'));
       return;
     }
     setGpsLoading(true);
@@ -149,7 +149,7 @@ export default function NewShopPage() {
     }).select('id').single();
 
     if (insertError || !shopData) {
-      setError(insertError?.message ?? 'Failed to create shop');
+      setError(insertError?.message ?? t('seller.failedCreateShop'));
       setLoading(false);
       return;
     }
@@ -203,7 +203,7 @@ export default function NewShopPage() {
               )}
               <label className="flex-1 cursor-pointer">
                 <div className="px-4 py-3 rounded-xl border border-border bg-surface hover:bg-surface-hover transition-colors text-sm text-center text-muted">
-                  {imageFile ? imageFile.name : 'Click to upload shop image (optional)'}
+                  {imageFile ? imageFile.name : t('seller.uploadShopImageOptional')}
                 </div>
                 <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
               </label>
@@ -236,7 +236,7 @@ export default function NewShopPage() {
 
           {/* Address search — full width so dropdown is never clipped */}
           <div>
-            <label className="block text-sm font-medium mb-1.5">Street / Road</label>
+            <label className="block text-sm font-medium mb-1.5">{t('seller.street')}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
               {addressSearching && (
@@ -248,7 +248,7 @@ export default function NewShopPage() {
                 onChange={(e) => handleAddressChange(e.target.value)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 300)}
                 onFocus={() => addressSuggestions.length > 0 && setShowSuggestions(true)}
-                placeholder="Start typing a street or address…"
+              placeholder={t('seller.addressPlaceholder')}
                 className="w-full pl-9 pr-4 py-3 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 autoComplete="off"
               />
@@ -275,7 +275,7 @@ export default function NewShopPage() {
           {/* House number, postal code, city */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1.5">House No.</label>
+              <label className="block text-sm font-medium mb-1.5">{t('seller.houseNumber')}</label>
               <input
                 type="text"
                 value={houseNumber}
@@ -285,7 +285,7 @@ export default function NewShopPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Postal Code</label>
+              <label className="block text-sm font-medium mb-1.5">{t('seller.postalCode')}</label>
               <input
                 type="text"
                 value={postalCode}
@@ -295,7 +295,7 @@ export default function NewShopPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">City</label>
+              <label className="block text-sm font-medium mb-1.5">{t('seller.city')}</label>
               <input
                 type="text"
                 value={city}
@@ -320,7 +320,7 @@ export default function NewShopPage() {
             </button>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-muted mb-1">Latitude</label>
+                <label className="block text-xs text-muted mb-1">{t('seller.latitude')}</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                   <input
@@ -334,7 +334,7 @@ export default function NewShopPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-muted mb-1">Longitude</label>
+                <label className="block text-xs text-muted mb-1">{t('seller.longitude')}</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                   <input
