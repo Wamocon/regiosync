@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Store, Package, Star, MessageSquare, Plus, MapPin, Trash2, Edit, X, Save, Image as ImageIcon, ToggleLeft, ToggleRight, Navigation } from 'lucide-react';
+import { Store, Package, Star, MessageSquare, Plus, MapPin, Trash2, Edit, X, Save, Image as ImageIcon, ToggleLeft, ToggleRight, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
 import { HelpButton } from '@/components/ui/HelpButton';
 import Image from 'next/image';
 
@@ -83,6 +83,7 @@ export function SellerDashboardClient({
   const [editLng, setEditLng] = useState<number | null>(null);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [openReviewShopId, setOpenReviewShopId] = useState<string | null>(null);
   const [editImageFile, setEditImageFile] = useState<File | null>(null);
   const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
   const supabase = createClient();
@@ -174,7 +175,7 @@ export function SellerDashboardClient({
       postal_code: editPostalCode || null,
       house_number: editHouseNumber || null,
       ...(editLat !== null && editLng !== null ? { latitude: editLat, longitude: editLng } : {}),
-      ...(imageUrl !== undefined ? { image_url: imageUrl } : {}),
+      ...(typeof imageUrl === 'string' ? { image_url: imageUrl } : {}),
     }).eq('id', editingShop.id);
     setEditLoading(false);
     setEditingShop(null);
@@ -470,7 +471,7 @@ export function SellerDashboardClient({
           })
         )}
       </div>
-      {/* Reviews section */}
+      {/* Reviews section - collapsible per shop */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">{t('seller.shopReviews')}</h2>
         {reviews.length === 0 ? (
@@ -482,37 +483,47 @@ export function SellerDashboardClient({
             const shopReviews = reviews.filter(r => r.shop_id === shop.id);
             if (shopReviews.length === 0) return null;
             const avg = (shopReviews.reduce((s, r) => s + r.rating, 0) / shopReviews.length).toFixed(1);
+            const isOpen = openReviewShopId === shop.id;
             return (
-              <div key={shop.id} className="mb-6">
-                <h3 className="text-sm font-semibold text-muted mb-2 flex items-center gap-2">
-                  <Store className="w-4 h-4" />{shop.name}
-                  <span className="flex items-center gap-0.5 text-accent">
-                    <Star className="w-3.5 h-3.5 fill-accent" />{avg}
+              <div key={shop.id} className="mb-4">
+                <button
+                  type="button"
+                  onClick={() => setOpenReviewShopId(isOpen ? null : shop.id)}
+                  className="w-full flex items-center justify-between px-4 py-3 glass-card hover:bg-surface-hover transition-colors"
+                >
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <Store className="w-4 h-4" />{shop.name}
+                    <span className="flex items-center gap-0.5 text-accent">
+                      <Star className="w-3.5 h-3.5 fill-accent" />{avg}
+                    </span>
+                    <span className="text-muted font-normal">({shopReviews.length})</span>
                   </span>
-                  <span className="text-muted font-normal">({shopReviews.length})</span>
-                </h3>
-                <div className="space-y-3">
-                  {shopReviews.map((review) => (
-                    <div key={review.id} className="glass-card p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="font-medium text-sm">{review.user?.full_name ?? 'Anonymous'}</p>
-                          <div className="flex items-center gap-0.5 mt-0.5">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star key={i} className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-accent text-accent' : 'text-border'}`} />
-                            ))}
+                  {isOpen ? <ChevronUp className="w-4 h-4 text-muted" /> : <ChevronDown className="w-4 h-4 text-muted" />}
+                </button>
+                {isOpen && (
+                  <div className="space-y-3 mt-2">
+                    {shopReviews.map((review) => (
+                      <div key={review.id} className="glass-card p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-medium text-sm">{review.user?.full_name ?? 'Anonymous'}</p>
+                            <div className="flex items-center gap-0.5 mt-0.5">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star key={i} className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-accent text-accent' : 'text-border'}`} />
+                              ))}
+                            </div>
                           </div>
+                          <span className="text-xs text-muted shrink-0" suppressHydrationWarning>
+                            {new Date(review.created_at).toLocaleDateString()}
+                          </span>
                         </div>
-                        <span className="text-xs text-muted shrink-0" suppressHydrationWarning>
-                          {new Date(review.created_at).toLocaleDateString()}
-                        </span>
+                        {review.comment && (
+                          <p className="text-sm text-muted mt-2">{review.comment}</p>
+                        )}
                       </div>
-                      {review.comment && (
-                        <p className="text-sm text-muted mt-2">{review.comment}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })

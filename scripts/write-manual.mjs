@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+import { writeFileSync, mkdirSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, '..');
+
+const html = `<!DOCTYPE html>
 <html lang="de" data-lang="de" data-theme="light">
 <head>
 <meta charset="UTF-8" />
@@ -622,7 +629,7 @@ function setLang(l){
 function toggleTheme(){
   var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
   document.documentElement.setAttribute('data-theme',t);
-  document.getElementById('theme-icon').textContent=t==='dark'?'☀️':'🌙';
+  document.getElementById('theme-icon').textContent=t==='dark'?'\u2600\uFE0F':'\uD83C\uDF19';
   localStorage.setItem('rs-theme',t);
 }
 var sections=document.querySelectorAll('.section');
@@ -643,8 +650,11 @@ window.addEventListener('scroll',onScroll,{passive:true});
   var theme=localStorage.getItem('rs-theme')||'light';
   setLang(lang);
   document.documentElement.setAttribute('data-theme',theme);
-  document.getElementById('theme-icon').textContent=theme==='dark'?'☀️':'🌙';
+  document.getElementById('theme-icon').textContent=theme==='dark'?'\u2600\uFE0F':'\uD83C\uDF19';
 })();
 </script>
 </body>
-</html>
+</html>`;
+
+writeFileSync(join(root, 'docs', 'manual', 'index.html'), html, 'utf8');
+console.log('✓ docs/manual/index.html written, size:', html.length, 'chars');

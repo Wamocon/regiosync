@@ -68,7 +68,7 @@ export default async function HelpPage() {
           <h2 className="text-xl font-bold mb-4">{t('help.contactUs')}</h2>
           <div className="flex items-center gap-3">
             <MessageCircle className="w-5 h-5 text-primary" />
-            <p>info@wamocon.de</p>
+            <p>info@wamocon.com</p>
           </div>
         </div>
       </main>
