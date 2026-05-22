@@ -5,7 +5,7 @@ import { routing } from '@/i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Handle i18n locale routing (redirects / -> /en, /de -> /de, etc.)
   const intlResponse = intlMiddleware(request);
 
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
       intlResponse.cookies.set(cookie.name, cookie.value);
     });
   } catch (err) {
-    console.error('[middleware] Supabase session update failed:', err);
+    console.error('[proxy] Supabase session update failed:', err);
   }
 
   return intlResponse;

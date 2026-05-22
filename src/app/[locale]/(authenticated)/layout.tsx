@@ -7,17 +7,23 @@ export default async function AuthenticatedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  // Gracefully handle Supabase failures - middleware already guards auth
+  let user = null;
   let profile = null;
-  if (user) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('role, is_pro')
-      .eq('id', user.id)
-      .single();
-    profile = data;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+    if (user) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('role, is_pro')
+        .eq('id', user.id)
+        .single();
+      profile = profileData;
+    }
+  } catch (err) {
+    console.error('[AuthenticatedLayout] Supabase error:', err);
   }
 
   return (
