@@ -188,7 +188,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
               }`}
             >
               {shopSubscribed ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
-              {shopSubscribed ? 'Unsubscribe' : 'Subscribe'}
+              {shopSubscribed ? t('user.unsubscribe') : t('user.subscribe')}
             </button>
             {isPro ? (
               <a
@@ -236,7 +236,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
                       <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                       {isUnavailable && (
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                          <span className="bg-white/90 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">Unavailable</span>
+                            <span className="bg-white/90 text-gray-800 text-xs font-bold px-3 py-1 rounded-full">{t('user.unavailable')}</span>
                         </div>
                       )}
                     </div>
@@ -252,7 +252,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
                           <span className="px-1.5 py-0.5 text-[10px] font-bold bg-accent text-white rounded">-{product.discount}%</span>
                         )}
                         {!product.image_url && isUnavailable && (
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-full">Unavailable</span>
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-full">{t('user.unavailable')}</span>
                         )}
                       </div>
                     </div>
@@ -292,7 +292,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
                       <button
                         onClick={() => toggleProductSubscription(product.id)}
                         disabled={subLoading === product.id}
-                        title={productSubscriptions.has(product.id) ? 'Unsubscribe from product alerts' : 'Get alerts for discounts & restocks'}
+                        title={productSubscriptions.has(product.id) ? t('user.unsubscribeProductAlerts') : t('user.getAlertsForDiscountsRestocks')}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                           productSubscriptions.has(product.id)
                             ? 'bg-primary/10 text-primary border border-primary/30'
@@ -300,7 +300,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
                         }`}
                       >
                         {productSubscriptions.has(product.id) ? <BellOff className="w-3.5 h-3.5" /> : <Bell className="w-3.5 h-3.5" />}
-                        {productSubscriptions.has(product.id) ? 'Subscribed' : 'Alert me'}
+                        {productSubscriptions.has(product.id) ? t('user.subscribed') : t('user.alertMe')}
                       </button>
                     </div>
                   </div>
@@ -325,7 +325,7 @@ export function ShopViewClient({ shop, userId, isPro, requestedTitles = [], isSu
                 onChange={(e) => setRequestDesc(e.target.value)}
                 rows={3}
                 className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"
-                placeholder="Any additional details about your request..."
+                placeholder={t('user.requestFormPlaceholder')}
               />
             </div>
             <div className="flex gap-3">

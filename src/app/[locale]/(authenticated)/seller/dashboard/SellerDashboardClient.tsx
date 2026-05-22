@@ -182,7 +182,7 @@ export function SellerDashboardClient({
                   )}
                   <label className="flex-1 cursor-pointer">
                     <div className="px-4 py-2.5 rounded-xl border border-border bg-surface hover:bg-surface-hover transition-colors text-sm text-center text-muted">
-                      {editImageFile ? editImageFile.name : 'Click to upload shop image'}
+                      {editImageFile ? editImageFile.name : t('seller.uploadShopImage')}
                     </div>
                     <input type="file" accept="image/*" onChange={handleEditImageChange} className="hidden" />
                   </label>
@@ -200,12 +200,12 @@ export function SellerDashboardClient({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Address</label>
+                  <label className="block text-sm font-medium mb-1">{t('seller.address')}</label>
                   <input value={editAddress} onChange={e => setEditAddress(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">City</label>
+                  <label className="block text-sm font-medium mb-1">{t('seller.city')}</label>
                   <input value={editCity} onChange={e => setEditCity(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm" />
                 </div>
@@ -297,10 +297,10 @@ export function SellerDashboardClient({
                       </p>
                     </div>
                     <div className="flex gap-1 shrink-0 ml-2">
-                      <button onClick={() => openEditShop(shop)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-primary transition-colors" title="Edit shop">
+                      <button onClick={() => openEditShop(shop)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-primary transition-colors" title={t('seller.editShop')}>
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDeleteShop(shop.id)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-red-500 transition-colors" title="Delete shop">
+                      <button onClick={() => handleDeleteShop(shop.id)} className="p-1.5 rounded-lg hover:bg-surface-hover text-muted hover:text-red-500 transition-colors" title={t('seller.deleteShop')}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -316,7 +316,7 @@ export function SellerDashboardClient({
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'
                           : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50'
                       }`}
-                      title="Toggle open / closed"
+                      title={t('seller.toggleStatus')}
                     >
                       {shop.is_active
                         ? <><ToggleRight className="w-3.5 h-3.5" />{t('user.openNow')}</>

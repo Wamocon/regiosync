@@ -52,7 +52,7 @@ export function AdminDashboardClient({ users, reports }: { users: Profile[]; rep
       router.refresh();
     } else {
       const data = await res.json();
-      alert(data.error ?? 'Failed to delete user');
+      alert(data.error ?? t('admin.failedDeleteUser'));
     }
   };
 
@@ -190,7 +190,7 @@ export function AdminDashboardClient({ users, reports }: { users: Profile[]; rep
                       <span className="font-medium text-sm">{report.reason}</span>
                     </div>
                     <p className="text-xs text-muted">
-                      By: {report.reporter?.full_name} | Against: {report.reported_user?.full_name}
+                      {t('admin.reportBy')}: {report.reporter?.full_name} | {t('admin.reportAgainst')}: {report.reported_user?.full_name}
                     </p>
                     <p className="text-xs text-muted mt-1">
                       <span suppressHydrationWarning>{new Date(report.created_at).toLocaleDateString()}</span>
@@ -208,7 +208,7 @@ export function AdminDashboardClient({ users, reports }: { users: Profile[]; rep
                         onClick={() => handleResolveReport(report.id, 'dismissed')}
                         className="px-3 py-1 text-xs bg-surface border border-border text-foreground rounded-lg hover:bg-surface-hover"
                       >
-                        Dismiss
+                        {t('admin.dismissReport')}
                       </button>
                     </div>
                   )}
@@ -216,7 +216,7 @@ export function AdminDashboardClient({ users, reports }: { users: Profile[]; rep
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       report.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                     }`}>
-                      {report.status}
+                      {report.status === 'resolved' ? t('admin.reportResolved') : t('admin.reportDismissed')}
                     </span>
                   )}
                 </div>

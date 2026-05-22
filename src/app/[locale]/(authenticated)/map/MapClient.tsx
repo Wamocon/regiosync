@@ -13,7 +13,7 @@ const LeafletMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="h-full flex items-center justify-center">
-        <p className="text-muted text-sm">Loading map...</p>
+        <p className="text-muted text-sm">{t('map.loadingMap')}</p>
       </div>
     ),
   }

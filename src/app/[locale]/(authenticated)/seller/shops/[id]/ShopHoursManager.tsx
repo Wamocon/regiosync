@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
 import { Clock, Save, ToggleLeft, ToggleRight, AlertCircle, CalendarDays } from 'lucide-react';
-
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 interface ShopHour {
   id?: string;
@@ -27,20 +26,14 @@ interface ShopHoursManagerProps {
   activeOverride: ShopOverride | null;
 }
 
-const OVERRIDE_PRESETS = [
-  { label: '1 hour', hours: 1 },
-  { label: '4 hours', hours: 4 },
-  { label: '8 hours', hours: 8 },
-  { label: '1 day', hours: 24 },
-  { label: '3 days', hours: 72 },
-  { label: '1 week', hours: 168 },
-];
+const OVERRIDE_PRESET_HOURS = [1, 4, 8, 24, 72, 168] as const;
+const OVERRIDE_PRESET_KEYS = ['1h', '4h', '8h', '1d', '3d', '1w'] as const;
 
 export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopHoursManagerProps) {
+  const t = useTranslations();
   const router = useRouter();
   const supabase = createClient();
 
-  // Build a full 7-day schedule from the DB data
   const buildSchedule = () =>
     Array.from({ length: 7 }, (_, i) => {
       const existing = initialHours.find((h) => h.day_of_week === i);
@@ -81,7 +74,6 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
 
   const applyOverride = async (status: 'open' | 'closed', untilIso: string) => {
     setOverrideLoading(true);
-    // Remove any existing override for this shop
     await supabase.from('shop_overrides').delete().eq('shop_id', shopId);
     const { data } = await supabase
       .from('shop_overrides')
@@ -113,8 +105,8 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
     <div className="glass-card p-6 mb-6">
       <div className="flex items-center gap-2 mb-5">
         <Clock className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-bold">Opening Hours</h2>
-        <span className="text-xs text-muted">(automatic open/close)</span>
+        <h2 className="text-lg font-bold">{t('shopHours.openingHours')}</h2>
+        <span className="text-xs text-muted">{t('shopHours.automaticOpenClose')}</span>
       </div>
 
       {/* Active Override Banner */}
@@ -127,7 +119,10 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>
-              <strong>Manual override active:</strong> Shop is {override.status} until {formatUntil(override.until)}
+              {t('shopHours.overrideActive', {
+                status: override.status === 'open' ? t('shopHours.overrideStatusOpen') : t('shopHours.overrideStatusClosed'),
+                until: formatUntil(override.until),
+              })}
             </span>
           </div>
           <button
@@ -135,7 +130,7 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
             disabled={overrideLoading}
             className="ml-4 px-3 py-1 text-xs rounded-lg border border-current hover:bg-black/5 transition-colors"
           >
-            Remove
+            {t('shopHours.removeOverride')}
           </button>
         </div>
       )}
@@ -144,13 +139,14 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
       <div className="space-y-2 mb-6">
         {schedule.map((day, idx) => (
           <div key={day.day_of_week} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
-            <span className="w-24 text-sm font-medium shrink-0">{DAYS[day.day_of_week]}</span>
+            <span className="w-24 text-sm font-medium shrink-0">
+              {t(`shopHours.days.${day.day_of_week}` as 'shopHours.days.0')}
+            </span>
 
-            {/* Toggle closed */}
             <button
               onClick={() => updateDay(idx, 'is_closed', !day.is_closed)}
               className="shrink-0"
-              title={day.is_closed ? 'Click to mark as open' : 'Click to mark as closed'}
+              title={day.is_closed ? t('shopHours.clickMarkOpen') : t('shopHours.clickMarkClosed')}
             >
               {day.is_closed
                 ? <ToggleLeft className="w-8 h-8 text-muted" />
@@ -158,7 +154,7 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
             </button>
 
             {day.is_closed ? (
-              <span className="text-sm text-muted italic">Closed</span>
+              <span className="text-sm text-muted italic">{t('shopHours.closed')}</span>
             ) : (
               <div className="flex items-center gap-2 flex-1 flex-wrap">
                 <input
@@ -167,7 +163,7 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
                   onChange={(e) => updateDay(idx, 'open_time', e.target.value)}
                   className="px-3 py-1.5 rounded-lg border border-border bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
-                <span className="text-xs text-muted">to</span>
+                <span className="text-xs text-muted">{t('shopHours.to')}</span>
                 <input
                   type="time"
                   value={day.close_time ?? '18:00'}
@@ -188,9 +184,9 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
           className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition-all text-sm font-medium disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
-          {saving ? 'Saving…' : savedOk ? 'Saved!' : 'Save Schedule'}
+          {saving ? t('shopHours.saving') : savedOk ? t('shopHours.saved') : t('shopHours.saveSchedule')}
         </button>
-        <span className="text-xs text-muted">The app will automatically show open/closed based on this schedule.</span>
+        <span className="text-xs text-muted">{t('shopHours.scheduleNote')}</span>
       </div>
 
       {/* Manual Override */}
@@ -199,15 +195,15 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
           <div>
             <h3 className="text-sm font-semibold flex items-center gap-1.5">
               <CalendarDays className="w-4 h-4 text-primary" />
-              Manual Override
+              {t('shopHours.manualOverride')}
             </h3>
-            <p className="text-xs text-muted mt-0.5">Temporarily force open or closed for a set duration</p>
+            <p className="text-xs text-muted mt-0.5">{t('shopHours.overrideDesc')}</p>
           </div>
           <button
             onClick={() => setShowOverridePanel(!showOverridePanel)}
             className="px-4 py-2 text-sm border border-border rounded-xl hover:bg-surface-hover transition-colors"
           >
-            {showOverridePanel ? 'Cancel' : 'Set Override'}
+            {showOverridePanel ? t('shopHours.cancelOverride') : t('shopHours.setOverride')}
           </button>
         </div>
 
@@ -215,16 +211,16 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
           <div className="rounded-xl border border-border bg-surface p-4 space-y-4">
             {/* Close shop temporarily */}
             <div>
-              <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Close shop for…</p>
+              <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">{t('shopHours.closeShopFor')}</p>
               <div className="flex flex-wrap gap-2">
-                {OVERRIDE_PRESETS.map((p) => (
+                {OVERRIDE_PRESET_HOURS.map((hours, i) => (
                   <button
-                    key={p.label}
-                    onClick={() => applyOverride('closed', addHours(p.hours))}
+                    key={hours}
+                    onClick={() => applyOverride('closed', addHours(hours))}
                     disabled={overrideLoading}
                     className="px-3 py-1.5 text-xs rounded-lg border border-red-200 text-red-700 dark:border-red-800 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
-                    {p.label}
+                    {t(`shopHours.presets.${OVERRIDE_PRESET_KEYS[i]}` as 'shopHours.presets.1h')}
                   </button>
                 ))}
               </div>
@@ -232,16 +228,16 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
 
             {/* Force open temporarily */}
             <div>
-              <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Force open for…</p>
+              <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">{t('shopHours.forceOpenFor')}</p>
               <div className="flex flex-wrap gap-2">
-                {OVERRIDE_PRESETS.map((p) => (
+                {OVERRIDE_PRESET_HOURS.map((hours, i) => (
                   <button
-                    key={p.label}
-                    onClick={() => applyOverride('open', addHours(p.hours))}
+                    key={hours}
+                    onClick={() => applyOverride('open', addHours(hours))}
                     disabled={overrideLoading}
                     className="px-3 py-1.5 text-xs rounded-lg border border-green-200 text-green-700 dark:border-green-800 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
                   >
-                    {p.label}
+                    {t(`shopHours.presets.${OVERRIDE_PRESET_KEYS[i]}` as 'shopHours.presets.1h')}
                   </button>
                 ))}
               </div>
@@ -249,7 +245,7 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
 
             {/* Custom datetime */}
             <div>
-              <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Custom until date & time</p>
+              <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">{t('shopHours.customUntil')}</p>
               <div className="flex gap-2 flex-wrap">
                 <input
                   type="datetime-local"
@@ -263,14 +259,14 @@ export function ShopHoursManager({ shopId, initialHours, activeOverride }: ShopH
                   disabled={!customUntil || overrideLoading}
                   className="px-3 py-1.5 text-xs rounded-lg border border-red-200 text-red-700 dark:border-red-800 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-40"
                 >
-                  Close until this time
+                  {t('shopHours.closeUntilTime')}
                 </button>
                 <button
                   onClick={() => customUntil && applyOverride('open', new Date(customUntil).toISOString())}
                   disabled={!customUntil || overrideLoading}
                   className="px-3 py-1.5 text-xs rounded-lg border border-green-200 text-green-700 dark:border-green-800 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-40"
                 >
-                  Open until this time
+                  {t('shopHours.openUntilTime')}
                 </button>
               </div>
             </div>

@@ -90,7 +90,7 @@ export function ShopsClient({ shops, isPro }: { shops: Shop[]; isPro: boolean })
               <div className="flex items-center justify-between text-xs text-muted">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3" />
-                  {shop.city || shop.address || 'Location'}
+                  {shop.city || shop.address || t('user.location')}
                 </span>
                 <span>{shop.products.length} {t('nav.products')}</span>
               </div>
@@ -103,7 +103,7 @@ export function ShopsClient({ shops, isPro }: { shops: Shop[]; isPro: boolean })
       {hiddenCount > 0 && (
         <div className="mt-8 glass-card p-6 text-center">
           <Lock className="w-8 h-8 text-muted mx-auto mb-3" />
-          <p className="font-medium mb-2">{hiddenCount} more shops available</p>
+          <p className="font-medium mb-2">{t('user.moreShopsAvailable', { count: hiddenCount })}</p>
           <p className="text-sm text-muted mb-4">{t('common.upgrade')}</p>
           <Link href="/pricing" className="inline-flex px-6 py-2.5 bg-accent text-white rounded-xl hover:bg-accent/90 transition-all text-sm font-medium">
             {t('common.upgrade')}

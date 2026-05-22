@@ -234,7 +234,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                 <label className="block text-sm font-medium mb-1">{t('seller.productQuantity')}</label>
                 <input type="number" min="0" value={qty} onChange={e => setQty(e.target.value)} className={inputCls} required />
                 {qty !== '' && parseInt(qty) === 0 && (
-                  <p className="text-xs text-orange-500 mt-1">Qty 0 marks product as Unavailable</p>
+                  <p className="text-xs text-orange-500 mt-1">{t('seller.qtyZeroWarning')}</p>
                 )}
               </div>
               <div>
@@ -261,7 +261,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                 )}
                 <label className="flex-1 cursor-pointer">
                   <div className="px-4 py-2.5 rounded-xl border border-border bg-surface hover:bg-surface-hover transition-colors text-sm text-center text-muted">
-                    {imageFile ? imageFile.name : 'Click to upload image (optional)'}
+                    {imageFile ? imageFile.name : t('seller.uploadImageOptional')}
                   </div>
                   <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
@@ -297,7 +297,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                 {/* SALE ribbon */}
                 {product.discount > 0 && (
                   <div className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-accent text-white text-[10px] font-bold rounded-full shadow">
-                    SALE -{product.discount}%
+                    {t('seller.saleLabel')} -{product.discount}%
                   </div>
                 )}
                 {/* Always show image area for consistent card height */}
@@ -343,7 +343,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                         <span className="text-xs text-muted line-through">{product.price.toFixed(2)} EUR</span>
                       )}
                     </div>
-                    <span className="text-xs text-muted">Qty: {product.quantity}</span>
+                    <span className="text-xs text-muted">{t('seller.quantityLabel')}: {product.quantity}</span>
                   </div>
                   <button
                     onClick={() => handleToggleAvailability(product.id, product.is_available)}
@@ -353,7 +353,7 @@ export function ShopDetailClient({ shop }: { shop: Shop }) {
                         : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                     }`}
                   >
-                    {isUnavailable ? 'Unavailable' : 'Available'}
+                  {isUnavailable ? t('seller.productUnavailable') : t('seller.productAvailable')}
                   </button>
                 </div>
               </div>

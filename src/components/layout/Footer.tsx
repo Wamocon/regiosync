@@ -42,7 +42,7 @@ export function Footer() {
 
           {/* Legal links */}
           <div>
-            <h4 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wide">Legal</h4>
+            <h4 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wide">{t('footer.legal')}</h4>
             <ul className="space-y-2">
               <li>
                 <Link href="/imprint" className="text-sm text-muted hover:text-primary transition-colors">
