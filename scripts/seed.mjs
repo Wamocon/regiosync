@@ -6,7 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = 'https://enpoccmooqnhbiniqaxt.supabase.co';
-const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVucG9jY21vb3FuaGJpbmlxYXh0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTMwODU5NSwiZXhwIjoyMDk0ODg0NTk1fQ.n1vH3u_9NfKzzTrS1ZoBycL1YgXnrmkFbNNYZsFbwTM';
+const SERVICE_ROLE_KEY = 'NextServiceRoleKeyFromSupabaseDashboard';
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false }
