@@ -1,6 +1,5 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
 
 export function Footer() {
@@ -13,10 +12,12 @@ export function Footer() {
           {/* Brand */}
           <div className="sm:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                <ShoppingBag className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold gradient-text">RegioSync</span>
+              <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
+                <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
+                  <Image src="/logo.svg" alt="RegioSync logo" width={32} height={32} priority />
+                </div>
+                <span className="text-xl font-bold gradient-text">RegioSync</span>
+              </Link>
             </div>
             <p className="text-muted text-sm max-w-xs">{t('common.tagline')}</p>
           </div>

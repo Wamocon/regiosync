@@ -3,9 +3,10 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Eye, EyeOff, Mail, Lock, ShoppingBag } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock} from 'lucide-react';
 
 export default function LoginPage() {
   const t = useTranslations();
@@ -44,7 +45,9 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
+                <Image src="/logo.svg" alt="RegioSync logo" width={32} height={32} priority />
+              </div>
             </div>
             <span className="text-2xl font-bold gradient-text">RegioSync</span>
           </Link>

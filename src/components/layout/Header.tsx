@@ -5,7 +5,8 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { NotificationBell } from '@/components/ui/NotificationBell';
-import { Menu, X, User, LogOut, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
@@ -56,8 +57,8 @@ export function Header({ user, userRole, isPro }: HeaderProps) {
 
           {/* ── Logo ─────────────────────────────────────────────── */}
           <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-              <ShoppingBag className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
+              <Image src="/logo.svg" alt="RegioSync logo" width={32} height={32} priority />
             </div>
             <span className="text-xl font-bold gradient-text whitespace-nowrap">RegioSync</span>
             {isPro && (

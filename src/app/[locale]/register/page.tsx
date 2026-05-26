@@ -3,9 +3,10 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from '@/i18n/navigation';
-import { Eye, EyeOff, Mail, Lock, User, ShoppingBag } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 
 export default function RegisterPage() {
   const t = useTranslations();
@@ -82,7 +83,7 @@ export default function RegisterPage() {
       <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background">
         <div className="w-full max-w-md glass-card p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <ShoppingBag className="w-8 h-8 text-primary" />
+            <Image src="/logo.svg" alt="RegioSync logo" width={32} height={32} priority />
           </div>
           <h1 className="text-2xl font-bold mb-2">{t('auth.registerSuccess')}</h1>
           <p className="text-muted mb-6">{t('auth.registerSubtitle')}</p>
@@ -100,8 +101,8 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-white" />
+            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
+              <Image src="/logo.svg" alt="RegioSync logo" width={32} height={32} priority />
             </div>
             <span className="text-2xl font-bold gradient-text">RegioSync</span>
           </Link>
